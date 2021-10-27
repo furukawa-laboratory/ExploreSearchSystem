@@ -55,9 +55,11 @@ def overwrite_search_form_value(n_clicks, popup_text, search_form, landing_form)
         search_form = landing_form or 'Machine Learning'
         logger.debug(f"search_form: {search_form}")
         return search_form, ''
-    else:  # additional search
+    elif popup_text != '':  # additional search
         word = popup_text.split(' ')[0]
         return search_form + f' "{word}"', ''
+    else:
+        return search_form, landing_form
 
 
 @app.callback([
