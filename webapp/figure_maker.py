@@ -243,16 +243,15 @@ def draw_scatter(fig, Z, labels, rank, viewer_name):
     return fig
 
 
-def make_figure(keyword, viewer_name="U_matrix", viewer_id=None, clicked_z=None):
-    csv_df, labels, X, history, rank, umatrix_hisotry = prepare_materials(keyword, 'TSOM')
+def make_figure(history, umatrix_hisotry, X, rank, labels, viewer_name='U_matrix', viewer_id=None, clicked_z=None):
     logger.debug(viewer_id)
     if viewer_id == 'viewer_1':
         Z, Y, sigma = history['Z1'], history['Y'], history['sigma']
-        labels = labels[0].tolist()
+        labels = labels[0] if isinstance(labels[0], list) else labels[0].tolist()
     elif viewer_id == 'viewer_2':
         Z, Y, sigma = history['Z2'], history['Y'], history['sigma']
         X = X.T
-        labels = labels[1].tolist()
+        labels = labels[1] if isinstance(labels[1], list) else labels[1].tolist()
         logger.debug(f"LABELS: {labels[:5]}")
     else:
         logger.debug("Set viewer_id")
@@ -331,3 +330,8 @@ def make_figure(keyword, viewer_name="U_matrix", viewer_id=None, clicked_z=None)
     )
 
     return fig
+
+
+def make_first_figure(viewer_id):
+    _, labels, X, history, rank, umatrix_hisotry = prepare_materials('Machine Learning', 'TSOM')
+    return make_figure(history, umatrix_hisotry, X, rank, labels, 'U-matrix', viewer_id, None)

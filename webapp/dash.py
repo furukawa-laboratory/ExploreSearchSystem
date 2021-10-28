@@ -4,7 +4,7 @@ import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html
 from webapp import app
-from webapp.figure_maker import make_figure
+from webapp.figure_maker import make_first_figure
 
 
 # U-Matrix の説明用のモーダル
@@ -104,9 +104,10 @@ make_map = lambda id, viewer_id: dbc.Col(
     children=dcc.Loading(
         dcc.Graph(
             id=id,
-            figure=make_figure("Machine Learning", "TSOM", viewer_id=viewer_id),
+            figure=make_first_figure(viewer_id),
             config=dict(displayModeBar=False),
         ),
+        id=f'{id}-loading',
     ),
     style={"height": "100%", "display":"none"},
     md=12,
@@ -216,4 +217,5 @@ landing_page_layout = dbc.Container(
 app.layout = html.Div([
     landing_page_layout,
     main_layout,
+    dcc.Store(id='memory'),
 ])
