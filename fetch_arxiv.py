@@ -4,7 +4,7 @@ import pandas as pd
 def fetch_search_result(search_query):
     search = arxiv.Search(
         query=search_query,
-        max_results=100,
+        max_results=50,
     )
     titles = []
     absts = []

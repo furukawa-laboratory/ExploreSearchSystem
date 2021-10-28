@@ -40,7 +40,7 @@ def make_bow(df):
     s = df['snippet']
     pos = preprocessing_tag_and_stopwords(s)
 
-    vectorizer = CountVectorizer(max_df=50, min_df=3)
+    vectorizer = CountVectorizer(max_df=20, min_df=3)
     X = vectorizer.fit_transform(pos)
     word_label = np.array(vectorizer.get_feature_names())
     # Tfidf

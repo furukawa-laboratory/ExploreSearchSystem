@@ -127,18 +127,35 @@ result_component = dbc.Row(
     no_gutters=True
 )
 
+
+word_addition_popover = dbc.Popover(
+    id='word-addition-popover',
+    target='paper-list-title',
+    children=dbc.Button(
+        id='word-addition-popover-button',
+        children="検索！",
+        className="btn btn-lg",
+    ),
+    trigger='focus',
+    className='bg-secondary',
+    style=dict(borderRight="#6c757d"),
+)
+
+
 paper_list = html.Div(
     id='paper-list',
     children=[
-        html.H3(
+        dbc.Col(
             id='paper-list-title',
             children="",
             className="display-4",
             style=dict(
                 fontFamily="Oswald, sans-serif",
                 textAlign="center",
-            )
+            ),
+            width=dict(size=6, offset=3)
         ),
+        word_addition_popover,
         html.Div(
             id='paper-list-components',
             children=[],
