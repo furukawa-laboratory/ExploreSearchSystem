@@ -30,6 +30,7 @@ def load_learning(n_clicks, n_clicks2, keyword, data, within_5years):
         snippet=df['snippet'].tolist(),
         url=df['URL'].tolist(),
         ranking=df['ranking'].tolist(),
+        year=df['year'].tolist(),
         history=history,
         umatrix_hisotry=umatrix_hisotry,
         X=X,
@@ -142,7 +143,7 @@ import numpy as np
 from scipy.spatial import distance as dist
 
 
-def make_paper_component(title, abst, url, rank):
+def make_paper_component(title, abst, url, rank, year):
     return dbc.Card([
         dbc.CardBody([
         html.A(
@@ -159,7 +160,7 @@ def make_paper_component(title, abst, url, rank):
             ),
         ),
         html.Span(
-            f"（{2021}年）",
+            f"（{year}年）",
         )]),
         dbc.CardFooter(abst)
     ], style=dict(
@@ -195,6 +196,7 @@ def make_paper_list(paperClickData, wordClickData, style, data):
     snippet = data['snippet']
     urls = data['url']
     ranking = data['ranking']
+    year = data['year']
     history = data['history']
     X = data['X']
     labels = data['labels']
@@ -236,7 +238,7 @@ def make_paper_list(paperClickData, wordClickData, style, data):
         paper_idxs = [idx for idx in paper_idxs if not (idx in seen or seen_add(idx))]
     logger.debug(f"Paper indexes {paper_idxs}")
     layout = [
-        make_paper_component(paper_labels[i], snippet[i], urls[i], ranking[i]) for i in paper_idxs
+        make_paper_component(paper_labels[i], snippet[i], urls[i], ranking[i], year[i]) for i in paper_idxs
     ]
     style['backgroundColor'] = PAPER_COLOR if map_name == 'paper-map' else WORD_COLOR
 
