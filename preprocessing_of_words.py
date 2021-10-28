@@ -48,6 +48,10 @@ def make_bow(df):
     tfidf = tfidf_transformer.fit_transform(X.toarray())
 
     features = np.array(tfidf.todense())
+
+    word_order = np.argsort(np.sum(features, axis=0))[::-1]
+    features = features[:, word_order]
+    word_label = word_label[word_order]
     return features, word_label
 
 if __name__ == '__main__':
