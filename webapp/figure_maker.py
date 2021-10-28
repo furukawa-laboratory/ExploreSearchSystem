@@ -335,3 +335,23 @@ def make_figure(history, umatrix_hisotry, X, rank, labels, viewer_name='U_matrix
 def make_first_figure(viewer_id):
     _, labels, X, history, rank, umatrix_hisotry = prepare_materials('Machine Learning', 'TSOM')
     return make_figure(history, umatrix_hisotry, X, rank, labels, 'U-matrix', viewer_id, None)
+
+
+def draw_toi(fig, clickData=None):
+    if not clickData:
+        return fig
+    radius = 0.15
+    x, y = clickData['points'][0]['x'], clickData['points'][0]['y']
+    fig.add_shape(
+        type='circle',
+        line=dict(
+            color='green',
+            width=3,
+            dash='longdashdot',
+        ),
+        x0=(x - radius),
+        y0=(y - radius),
+        x1=(x + radius),
+        y1=(y + radius),
+    )
+    return fig

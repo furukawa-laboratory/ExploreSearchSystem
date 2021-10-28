@@ -3,7 +3,7 @@ from dash.dependencies import Input, Output, State
 from webapp import app, logger
 from webapp.figure_maker import (
     make_figure, prepare_materials, get_bmu,
-    PAPER_COLOR, WORD_COLOR,
+    PAPER_COLOR, WORD_COLOR, draw_toi,
 )
 
 @app.callback([
@@ -57,10 +57,12 @@ def draw_maps(_, viewer_name, p_clickData, w_clickData, data):
     ctx = dash.callback_context
     logger.debug(ctx.triggered[0]['prop_id'])
     logger.debug(type(ctx.triggered[0]['prop_id']))
-    if ctx.triggered[0]['prop_id'] == 'paper-map.clickData':
+    is_papermap_clicked = ctx.triggered[0]['prop_id'] == 'paper-map.clickData'
+    is_wordmap_clicked  = ctx.triggered[0]['prop_id'] == 'word-map.clickData'
+    if is_papermap_clicked:
         if p_clickData and "points" in p_clickData and "pointIndex" in p_clickData["points"][0]:
             viewer_2_name = 'CCP'
-    elif ctx.triggered[0]['prop_id'] == 'word-map.clickData':
+    elif is_wordmap_clicked:
         if w_clickData and "points" in w_clickData and "pointIndex" in w_clickData["points"][0]:
             viewer_1_name = 'CCP'
 
@@ -74,6 +76,11 @@ def draw_maps(_, viewer_name, p_clickData, w_clickData, data):
     X = np.array(X)
     paper_fig = make_figure(history, umatrix_hisotry, X, rank, labels, viewer_1_name, 'viewer_1', w_clickData)
     word_fig  = make_figure(history, umatrix_hisotry, X, rank, labels, viewer_2_name, 'viewer_2', p_clickData)
+    if is_papermap_clicked:
+        paper_fig = draw_toi(paper_fig, p_clickData)
+    elif is_wordmap_clicked:
+        word_fig = draw_toi(word_fig, w_clickData)
+
     return paper_fig, word_fig
 
 
