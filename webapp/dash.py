@@ -47,7 +47,6 @@ link_card = dbc.Card([
 
 
 view_options = dbc.Col([
-    dbc.Row(
         dbc.RadioItems(
             options=[
                 {'label': 'U-matrix 表示', 'value': 'U-matrix'},
@@ -57,14 +56,11 @@ view_options = dbc.Col([
             value='U-matrix',
             id="viewer-selector",
             inline=True,
-            className="h3",
+            className="",
         ),
-        style=dict(height="50%", padding="10"),
-        align="center",
-    )],
+    ],
     width=12,
-    style={"padding-left":"30px", "height": "50%"},
-    className="card",
+    style=dict(marginTop='10px', borderColor='white'),
 )
 
 
@@ -76,7 +72,7 @@ make_search_component = lambda landing: dbc.Col([
                 id=f'{"landing-" if landing else ""}search-form',
                 type="text",
                 placeholder="検索ワードを入力してください",
-                style=dict(width="100%", fontSize="18px"),
+                style=dict(width=f"{100 if landing else 80}%", fontSize="18px"),
                 className="form-control form-control-lg"),
             width=10,
         ),
@@ -89,10 +85,9 @@ make_search_component = lambda landing: dbc.Col([
                 style=dict(fontSize='0.8rem'),
             ),
             width=2,
-        ),
+        )], align="center"),
         view_options if not landing else None,
-        ],
-        align="center")],
+    ],
     style={"padding":"10px"},
     md=12,
     xl=8,
@@ -213,7 +208,7 @@ landing_page_layout = dbc.Container(
         ], className='landing--box'),
         html.H4(
             '論文探索エンジン',
-            className="landing--title"
+            className="landing--title",
         ),
         html.Div(
             children=[
