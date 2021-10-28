@@ -143,8 +143,19 @@ from scipy.spatial import distance as dist
 
 def make_paper_component(title, abst, url, rank):
     return html.Div([
-        rank,
-        html.A(title, href=url, target='blank'),
+        html.A(
+            title,
+            href=url,
+            target='blank',
+            className='display-6 text-dark',
+            style=dict(fontSize='1.5rem')
+        ),
+        html.Span(
+            rank,
+            style=dict(
+                verticalAlign='top',
+            ),
+        ),
         html.P(abst)
     ])
 

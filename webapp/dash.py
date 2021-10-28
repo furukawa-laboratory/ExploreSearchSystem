@@ -131,10 +131,11 @@ word_addition_popover = dbc.Popover(
         id='word-addition-popover-button',
         children="検索！",
         className="btn btn-lg",
+        style=dict(fontSize='0.8rem')
     ),
     trigger='focus',
     className='bg-secondary',
-    style=dict(borderRight="#6c757d"),
+    style=dict(borderRight="#6c757d",),
 )
 
 
@@ -144,11 +145,12 @@ paper_list = html.Div(
         dbc.Col(
             id='paper-list-title',
             children="",
-            className="display-4",
             style=dict(
                 fontFamily="Oswald, sans-serif",
                 textAlign="center",
+                fontSize='2rem',
             ),
+            className="display-5",
             width=dict(size=6, offset=3)
         ),
         word_addition_popover,
