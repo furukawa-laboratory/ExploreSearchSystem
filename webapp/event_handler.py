@@ -112,7 +112,6 @@ def overwrite_search_form_value(n_clicks1, n_clicks2, popup_text, search_form, l
         Output('landing', 'style'),
         Output('paper-map-col', 'style'),
         Output('word-map-col', 'style'),
-        Output('viewer-selector', 'value'),
     ], [
         Input('landing-explore-start', 'n_clicks'),
     ], [
@@ -130,7 +129,7 @@ def make_page(n_clicks, keyword):
     paper_style['display'] = 'block'
     word_style['display'] = 'block'
 
-    return main_style, landing_style, paper_style, word_style, 'CCP'
+    return main_style, landing_style, paper_style, word_style
 
 
 

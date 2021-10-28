@@ -229,7 +229,6 @@ def draw_scatter(fig, Z, labels, rank, viewer_name):
             x=Z[:, 0],
             y=Z[:, 1],
             mode=f"markers+text",
-            name='lv',
             marker=dict(
                 size=rank[::-1],
                 sizemode='area',
