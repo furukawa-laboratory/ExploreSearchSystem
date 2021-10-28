@@ -86,6 +86,7 @@ make_search_component = lambda landing: dbc.Col([
                 children="検索！",
                 color="primary",
                 className="btn btn-primary btn-lg",
+                style=dict(fontSize='0.8rem'),
             ),
             width=2,
         ),
@@ -176,7 +177,7 @@ main_layout = dbc.Container(children=[
             html.H1(
                 id='title',
                 children='論文探索エンジン',
-                className="display-4",
+                className="display-5",
                 style=dict(
                     fontFamily="Oswald, sans-serif",
                     textAlign="center",
