@@ -16,6 +16,10 @@ from itertools import groupby
 resolution = 10
 PAPER_COLOR = '#d3f284'
 WORD_COLOR = '#fffa73'
+CCP_VIEWER = 'CCP'
+UMATRIX_VIEWER = 'U-matrix'
+TOPIC_VIEWER = 'topic'
+
 
 def prepare_umatrix(keyword, X, Z1, Z2, sigma, labels, u_resolution):
     umatrix_save_path = 'data/tmp/'+ keyword +'_umatrix_history.pickle'
@@ -325,16 +329,22 @@ def make_first_figure(viewer_id):
     return make_figure(history, umatrix_hisotry, X, rank, labels, 'U-matrix', viewer_id, None)
 
 
-def draw_toi(fig, clickData=None):
+def draw_toi(fig, clickData, view_method):
     if not clickData:
         return fig
+
+    color = {
+        CCP_VIEWER: 'green',
+        UMATRIX_VIEWER: '#ffd700',
+        TOPIC_VIEWER: 'yellow',
+    }[view_method]
     radius = 0.15
     x, y = clickData['points'][0]['x'], clickData['points'][0]['y']
     fig.add_shape(
         type='circle',
         line=dict(
-            color='green',
-            width=3,
+            color=color,
+            width=5,
             dash='longdashdot',
         ),
         x0=(x - radius),
