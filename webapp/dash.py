@@ -217,12 +217,5 @@ landing_page_layout = dbc.Container(
 app.layout = html.Div([
     landing_page_layout,
     main_layout,
-    dcc.Input(
-        id='draw-counter',
-        value=0,
-        type='number',
-        style=(),
-        # disabled=True,
-    ),
     dcc.Store(id='memory'),
 ])
