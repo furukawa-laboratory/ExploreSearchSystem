@@ -40,18 +40,21 @@ def make_bow(df):
     s = df['snippet']
     pos = preprocessing_tag_and_stopwords(s)
 
-    vectorizer = CountVectorizer(max_df=20, min_df=3)
+    vectorizer = CountVectorizer(max_df=0.5, min_df=0.03)
     X = vectorizer.fit_transform(pos)
+    X_array = X.toarray()
     word_label = np.array(vectorizer.get_feature_names())
     # Tfidf
     tfidf_transformer = TfidfTransformer(norm='l2', sublinear_tf=True)
-    tfidf = tfidf_transformer.fit_transform(X.toarray())
+    tfidf = tfidf_transformer.fit_transform(X_array)
 
     features = np.array(tfidf.todense())
 
+    word_num = 100
+    print('最小出現回数＝' + str(min(np.sum(X_array[:, :word_num], axis=0))))
     word_order = np.argsort(np.sum(features, axis=0))[::-1]
-    features = features[:, word_order]
-    word_label = word_label[word_order]
+    features = features[:, word_order][:, :word_num]
+    word_label = word_label[word_order][:word_num]
     return features, word_label
 
 if __name__ == '__main__':
