@@ -17,6 +17,42 @@ resolution = 10
 PAPER_COLOR = '#d3f284'
 WORD_COLOR = '#fffa73'
 
+def prepare_umatrix(keyword, X, Z1, Z2, sigma, labels, u_resolution):
+    umatrix_save_path = 'data/tmp/'+ keyword +'_umatrix_history.pickle'
+    if pathlib.Path(umatrix_save_path).exists():
+        logger.debug("U-matix already calculated")
+        with open(umatrix_save_path, 'rb') as f:
+            umatrix_history = pickle.load(f)
+    else:
+        logger.debug("Umatrix calculating")
+        umatrix = Grad_Norm(
+            X=X,
+            Z=Z1,
+            sigma=sigma,
+            labels=labels,
+            resolution=u_resolution,
+            title_text="dammy"
+        )
+        U_matrix1, _, _ = umatrix.calc_umatrix()
+        umatrix2 = Grad_Norm(
+            X=X.T,
+            Z=Z2,
+            sigma=sigma,
+            labels=labels,
+            resolution=u_resolution,
+            title_text="dammy"
+        )
+        U_matrix2, _, _ = umatrix2.calc_umatrix()
+        umatrix_history = dict(
+            umatrix1=U_matrix1.reshape(u_resolution, u_resolution),
+            umatrix2=U_matrix2.reshape(u_resolution, u_resolution),
+            zeta = np.linspace(-1, 1, u_resolution),
+        )
+        logger.debug("Calculating finished.")
+        with open(umatrix_save_path, 'wb') as f:
+            pickle.dump(umatrix_history, f)
+
+    return umatrix_history
 
 def prepare_materials(keyword, model_name):
     logger.info(f"Preparing {keyword} map with {model_name}")
@@ -81,24 +117,23 @@ def prepare_materials(keyword, model_name):
         logger.debug("Learning finished.")
         with open(model_save_path, 'wb') as f:
             pickle.dump(history, f)
-    return csv_df, labels, X, history, rank
+
+    # ここの学習はCCPの描画が終わって結果をだしたあとに始めてもよさそう
+    umatrix_history = prepare_umatrix(keyword, X, history['Z1'], history['Z2'], history['sigma'], None, int(resolution**2))
+    return csv_df, labels, X, history, rank, umatrix_history
 
 
-def draw_umatrix(fig, X, Z, sigma, u_resolution, labels):
-    umatrix = Grad_Norm(
-        X=X,
-        Z=Z,
-        sigma=sigma,
-        labels=labels,
-        resolution=u_resolution,
-        title_text="dammy"
-    )
-    U_matrix, _, _ = umatrix.calc_umatrix()
+def draw_umatrix(fig, umatrix_history, viewer_id):
+    if viewer_id == 'viewer_1':
+        z = umatrix_history['umatrix1']
+    elif viewer_id == 'viewer_2':
+        z = umatrix_history['umatrix2']
+    zeta = umatrix_history['zeta']
     fig.add_trace(
         go.Contour(
-            x=np.linspace(-1, 1, u_resolution),
-            y=np.linspace(-1, 1, u_resolution),
-            z=U_matrix.reshape(u_resolution, u_resolution),
+            x=zeta,
+            y=zeta,
+            z=z,
             name='contour',
             colorscale="gnbu",
             hoverinfo='skip',
@@ -208,15 +243,15 @@ def draw_scatter(fig, Z, labels, rank, viewer_name):
     return fig
 
 
-def make_figure(keyword, viewer_name="U_matrix", viewer_id=None, clicked_z=None):
-    csv_df, labels, X, history, rank = prepare_materials(keyword, 'TSOM')
+def make_figure(history, umatrix_hisotry, X, rank, labels, viewer_name='U_matrix', viewer_id=None, clicked_z=None):
     logger.debug(viewer_id)
     if viewer_id == 'viewer_1':
         Z, Y, sigma = history['Z1'], history['Y'], history['sigma']
-        labels = labels[0].tolist()
+        labels = labels[0] if isinstance(labels[0], list) else labels[0].tolist()
     elif viewer_id == 'viewer_2':
         Z, Y, sigma = history['Z2'], history['Y'], history['sigma']
-        labels = labels[1].tolist()
+        X = X.T
+        labels = labels[1] if isinstance(labels[1], list) else labels[1].tolist()
         logger.debug(f"LABELS: {labels[:5]}")
     else:
         logger.debug("Set viewer_id")
@@ -252,10 +287,7 @@ def make_figure(keyword, viewer_name="U_matrix", viewer_id=None, clicked_z=None)
     elif viewer_name=="CCP":
         fig = draw_ccp(fig, Y, history['Zeta'], history['resolution'], clicked_z, viewer_id)
     else:
-        logger.debug("U-matrix not implemented")
-        NotImplemented
-        # u_resolution = 100
-        # fig = draw_umatrix(fig, X, Z, sigma, u_resolution, labels)
+        fig = draw_umatrix(fig, umatrix_hisotry, viewer_id)
 
     # Show words when it is highlighted
     # if viewer_id == 'viewer_2' and not clicked_z == None:
@@ -298,3 +330,8 @@ def make_figure(keyword, viewer_name="U_matrix", viewer_id=None, clicked_z=None)
     )
 
     return fig
+
+
+def make_first_figure(viewer_id):
+    _, labels, X, history, rank, umatrix_hisotry = prepare_materials('Machine Learning', 'TSOM')
+    return make_figure(history, umatrix_hisotry, X, rank, labels, 'U-matrix', viewer_id, None)

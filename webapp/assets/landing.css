@@ -1,0 +1,126 @@
+.landing {
+    font-family: Roboto;
+    align-items: center;
+    text-align: center;
+    right: 0;
+    left: 0;
+    margin: auto;
+}
+
+.landing .landing--title {
+    position: absolute;
+    right: 0;
+    left: 0;
+    top: 30vh;
+    margin: auto;
+
+    font-style: normal;
+    font-weight: normal;
+    font-size: 5vw;
+    line-height: 103px;
+    min-width: none;
+    align-items: center;
+    align-self: center;
+    text-align: center;
+
+    color: #000000;
+
+    text-shadow: 2px 2px 0 #FFF, -2px -2px 0 #FFF,
+                 -2px 2px 0 #FFF, 2px -2px 0 #FFF,
+                 0px 2px 0 #FFF,  0 -2px 0 #FFF,
+                 -2px 0 0 #FFF,   2px 0 0 #FFF;
+}
+
+.landing .landing--search-form {
+    position: absolute;
+    width: 70vw;
+    top: 70vh;
+    right: 0;
+    left: 0;
+
+    filter: drop-shadow(0px 8px 8px rgba(0, 0, 0, 0.25));
+    float: center;
+    text-align: center;
+    margin: auto;
+}
+
+.landing .landing--short-description {
+    position: absolute;
+    top: 50vh;
+    right: 0;
+    left: 0;
+
+    font-style: normal;
+    font-weight: normal;
+    font-size: 3vmin;
+    align-items: center;
+    align-self: center;
+    text-align: center;
+    margin: auto;
+
+    color: #000000;
+
+    text-shadow: 1px 1px 0 #FFF, -1px -1px 0 #FFF,
+                 -1px 1px 0 #FFF, 1px -1px 0 #FFF,
+                 0px 1px 0 #FFF,  0 -1px 0 #FFF,
+                 -1px 0 0 #FFF,   1px 0 0 #FFF;
+}
+
+.landing .landing--howto-navi {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 92.5vh;
+    margin: auto;
+
+    font-style: normal;
+    font-weight: normal;
+    font-size: 2vw;
+    line-height: 28px;
+    align-items: center;
+    text-align: center;
+
+    color: #000000;
+}
+
+.landing .landing--box {
+    position: absolute;
+    background: #666666;
+    top: 10vh;
+    height: 80vmin;
+    right: 0;
+    left: 0;
+
+    margin: auto;
+}
+
+.landing .landing--box .landing--box--yellow {
+    position: absolute;
+    width: 50%;
+    height: 100%;
+    left: 0;
+    right: 0;
+    margin: auto;
+    margin-right: 0;
+
+    align-items: center;
+    text-align: center;
+
+    background: #E7DF25;
+    border: 2px solid #FFFFFF;
+    box-sizing: border-box;
+}
+
+.landing .landing--box .landing--box--green {
+    position: absolute;
+    width: 50%;
+    height: 100%;
+    left: 0;
+    right: 0;
+    margin: auto;
+    margin-left: 0;
+
+    background: #90D050;
+    border: 2px solid #FFFFFF;
+    box-sizing: border-box;
+}

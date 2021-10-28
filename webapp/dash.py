@@ -4,7 +4,7 @@ import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html
 from webapp import app
-from webapp.figure_maker import make_figure
+from webapp.figure_maker import make_first_figure
 
 
 # U-Matrix の説明用のモーダル
@@ -95,7 +95,7 @@ make_search_component = lambda landing: dbc.Col([
     style={"padding":"10px"},
     md=12,
     xl=8,
-    className="card",
+    className=f"card {'landing--search-form' if landing else ''}",
 )
 
 
@@ -104,9 +104,10 @@ make_map = lambda id, viewer_id: dbc.Col(
     children=dcc.Loading(
         dcc.Graph(
             id=id,
-            figure=make_figure("Machine Learning", "TSOM", viewer_id=viewer_id),
+            figure=make_first_figure(viewer_id),
             config=dict(displayModeBar=False),
         ),
+        id=f'{id}-loading',
     ),
     style={"height": "100%", "display":"none"},
     md=12,
@@ -201,13 +202,37 @@ main_layout = dbc.Container(children=[
 ], id='main', style=dict(display="none"))
 
 
-landing_page_layout = dbc.Container(children=[
-    html.H1('Hello.'),
-    make_search_component(landing=True),
-], id='landing')
+landing_page_layout = dbc.Container(
+    id='landing',
+    className='landing',
+    children=[
+        html.Div([
+            html.Div(className='landing--box--green'),
+            html.Div(className='landing--box--yellow'),
+        ], className='landing--box'),
+        html.H4(
+            '論文探索エンジン',
+            className="landing--title"
+        ),
+        html.Div(
+            children=[
+                "arXiv のデータベースと AI 技術を活用した", html.Br(),
+                "論文探しをサポートする Web アプリケーションです．", html.Br(),
+                "2つのマップと3種類の可視化方法で", html.Br(),
+                "新しい論文探索体験を提供します．", html.Br(),
+            ],
+            className='landing--short-description',
+        ),
+        make_search_component(landing=True),
+        # html.Div(
+        #     '使い方はこちら',
+        #     className='landing--howto-navi',
+        # ),
+])
 
 
 app.layout = html.Div([
     landing_page_layout,
     main_layout,
+    dcc.Store(id='memory'),
 ])
