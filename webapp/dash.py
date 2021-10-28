@@ -78,8 +78,22 @@ make_search_component = lambda landing: dbc.Col([
                 placeholder="検索ワードを入力してください",
                 style=dict(width="100%", fontSize="18px"),
                 className="form-control form-control-lg"),
-            width=10,
+            width=(10 if landing else 8),
         ),
+        (dbc.Col(
+            dbc.Select(
+                options=[
+                    {'label': '期間指定なし', 'value': 'NO'},
+                    {'label': '過去5年以内', 'value': 'YES'},
+                ],
+                id="published-date-limit",
+                className="h3",
+                value='NO',
+            ),
+            style=dict(height="50%", padding="10"),
+            align="center",
+            width=2,
+        ) if not landing else None),
         dbc.Col(
             dbc.Button(
                 id=f'{"landing-" if landing else ""}explore-start',
