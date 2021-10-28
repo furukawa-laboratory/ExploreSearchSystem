@@ -76,9 +76,9 @@ def draw_maps(_, viewer_name, p_clickData, w_clickData, data):
     X = np.array(X)
     paper_fig = make_figure(history, umatrix_hisotry, X, rank, labels, viewer_1_name, 'viewer_1', w_clickData)
     word_fig  = make_figure(history, umatrix_hisotry, X, rank, labels, viewer_2_name, 'viewer_2', p_clickData)
-    if is_papermap_clicked:
+    if viewer_1_name == 'CCP' and p_clickData:
         paper_fig = draw_toi(paper_fig, p_clickData)
-    elif is_wordmap_clicked:
+    if viewer_2_name == 'CCP' and w_clickData:
         word_fig = draw_toi(word_fig, w_clickData)
 
     return paper_fig, word_fig
