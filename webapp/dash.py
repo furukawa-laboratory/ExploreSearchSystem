@@ -154,17 +154,20 @@ paper_list = html.Div(
             width=dict(size=6, offset=3),
         ),
         word_addition_popover,
-        html.Div(
+        dbc.Col(
             id='paper-list-components',
             children=[],
             style=dict(
-                borderWidth="10px",
-                borderColor="white",
-                borderStyle="solid",
-                borderRadius="5px",
             ),
+            width=dict(size=10, offset=1),
         ),
-    ]
+    ],
+    style=dict(
+        borderWidth="10px",
+        borderColor="white",
+        borderStyle="solid",
+        borderRadius="1.5vw",
+    )
 )
 
 

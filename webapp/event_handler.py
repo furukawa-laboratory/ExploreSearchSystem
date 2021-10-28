@@ -158,13 +158,18 @@ def make_paper_component(title, abst, url, rank):
             ),
         ),]),
         dbc.CardFooter(abst)
-    ], style=dict(marginButtom='10px',))
+    ], style=dict(
+        marginBottom='10px',
+        filter='drop-shadow(0px 8px 8px rgba(0, 0, 0, 0.25))',
+    ))
 
 
 @app.callback([
         Output('paper-list-title', 'children'),
         Output('paper-list-components', 'children'),
-        Output('paper-list-components', 'style'),
+        # Output('paper-list-components', 'style'),
+        # Output('paper-list-title', 'style'),
+        Output('paper-list', 'style'),
         Output('word-addition-popover', 'is_open'),
         Output('word-addition-popover-button', 'children'),
     ],
@@ -173,7 +178,9 @@ def make_paper_component(title, abst, url, rank):
         Input('word-map', 'clickData'),
     ],
     [
-        State('paper-list-components', 'style'),
+        # State('paper-list-components', 'style'),
+        # State('paper-list-title', 'style'),
+        State('paper-list', 'style'),
         State('memory', 'data'),
     ],
     prevent_initial_call=True
@@ -231,6 +238,6 @@ def make_paper_list(paperClickData, wordClickData, style, data):
     layout = [
         make_paper_component(paper_labels[i], snippet[i], urls[i], ranking[i]) for i in paper_idxs
     ]
-    style['borderColor'] = PAPER_COLOR if map_name == 'paper-map' else WORD_COLOR
+    style['backgroundColor'] = PAPER_COLOR if map_name == 'paper-map' else WORD_COLOR
 
     return title, layout, style, should_popover_open, popup_text
