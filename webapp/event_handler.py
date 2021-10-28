@@ -76,10 +76,10 @@ def draw_maps(_, viewer_name, p_clickData, w_clickData, data):
     X = np.array(X)
     paper_fig = make_figure(history, umatrix_hisotry, X, rank, labels, viewer_1_name, 'viewer_1', w_clickData)
     word_fig  = make_figure(history, umatrix_hisotry, X, rank, labels, viewer_2_name, 'viewer_2', p_clickData)
-    if viewer_1_name == 'CCP' and p_clickData:
-        paper_fig = draw_toi(paper_fig, p_clickData)
-    if viewer_2_name == 'CCP' and w_clickData:
-        word_fig = draw_toi(word_fig, w_clickData)
+    if viewer_2_name == 'CCP' and p_clickData:
+        paper_fig = draw_toi(paper_fig, p_clickData, viewer_1_name)
+    if viewer_1_name == 'CCP' and w_clickData:
+        word_fig = draw_toi(word_fig, w_clickData, viewer_2_name)
 
     return paper_fig, word_fig
 
