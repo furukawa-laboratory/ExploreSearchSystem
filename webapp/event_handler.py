@@ -20,10 +20,14 @@ from webapp.figure_maker import (
         State('memory', 'data'),
 ])
 def load_learning(n_clicks, n_clicks2, keyword, data):
+    logger.info('load_learning called')
     keyword = keyword or "Machine Learning"
-    _, labels, X, history, rank, umatrix_hisotry = prepare_materials(keyword, 'TSOM')
+    df, labels, X, history, rank, umatrix_hisotry = prepare_materials(keyword, 'TSOM')
     data = data or dict()
     data.update(
+        snippet=df['snippet'].tolist(),
+        url=df['URL'].tolist(),
+        ranking=df['ranking'].tolist(),
         history=history,
         umatrix_hisotry=umatrix_hisotry,
         X=X,
@@ -60,7 +64,11 @@ def draw_maps(_, viewer_name, p_clickData, w_clickData, data):
         if w_clickData and "points" in w_clickData and "pointIndex" in w_clickData["points"][0]:
             viewer_1_name = 'CCP'
 
-    history, umatrix_hisotry, X, rank, labels = data['history'], data['umatrix_hisotry'], data['X'], data['rank'], data['labels']
+    history = data['history']
+    umatrix_hisotry = data['umatrix_hisotry']
+    X = data['X']
+    rank = data['rank']
+    labels = data['labels']
     logger.debug('learned data loaded.')
     history = {key: np.array(val) for key, val in history.items()}
     X = np.array(X)
@@ -74,12 +82,13 @@ def draw_maps(_, viewer_name, p_clickData, w_clickData, data):
         Output('landing-search-form', 'value'),
     ], [
         Input('landing-explore-start', 'n_clicks'),
-        Input('word-addition-popover-button', 'children'),
+        Input('word-addition-popover-button', 'n_clicks'),
     ], [
+        State('word-addition-popover-button', 'children'),
         State('search-form', 'value'),
         State('landing-search-form', 'value'),
     ], prevent_initial_call=True)
-def overwrite_search_form_value(n_clicks, popup_text, search_form, landing_form):
+def overwrite_search_form_value(n_clicks1, n_clicks2, popup_text, search_form, landing_form):
     if landing_form != '':  # first search
         search_form = landing_form or 'Machine Learning'
         logger.debug(f"search_form: {search_form}")
@@ -145,22 +154,30 @@ def make_paper_component(title, abst, url, rank):
         Input('word-map', 'clickData'),
     ],
     [
-        State('search-form', 'value'),
         State('paper-list-components', 'style'),
+        State('memory', 'data'),
     ],
     prevent_initial_call=True
 )
-def make_paper_list(paperClickData, wordClickData, keyword, style):
+def make_paper_list(paperClickData, wordClickData, style, data):
     logger.debug('make_paper_list')
 
     ctx = dash.callback_context
     map_name = ctx.triggered[0]['prop_id'].split('.')[0]
     logger.info(f"map_name: {map_name}")
 
-    df, labels, _, history, _, _ = prepare_materials(keyword, 'TSOM')
+    snippet = data['snippet']
+    urls = data['url']
+    ranking = data['ranking']
+    history = data['history']
+    X = data['X']
+    labels = data['labels']
+    logger.debug('learned data loaded.')
+    history = {key: np.array(val) for key, val in history.items()}
+    X = np.array(X)
     Z2 = history['Z2']
-    paper_labels = labels[0].values.tolist()
-    word_labels = labels[1].tolist()
+    paper_labels = labels[0]
+    word_labels = labels[1]
     if map_name == 'paper-map':
         should_popover_open = False
         clicked_point = [[paperClickData['points'][0]['x'], paperClickData['points'][0]['y']]] if paperClickData else [[0, 0]]
@@ -193,7 +210,7 @@ def make_paper_list(paperClickData, wordClickData, keyword, style):
         paper_idxs = [idx for idx in paper_idxs if not (idx in seen or seen_add(idx))]
     logger.debug(f"Paper indexes {paper_idxs}")
     layout = [
-        make_paper_component(paper_labels[i], df['snippet'][i], df['URL'][i], df['ranking'][i]) for i in paper_idxs
+        make_paper_component(paper_labels[i], snippet[i], urls[i], ranking[i]) for i in paper_idxs
     ]
     style['borderColor'] = PAPER_COLOR if map_name == 'paper-map' else WORD_COLOR
 
