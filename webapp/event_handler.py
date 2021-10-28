@@ -157,7 +157,10 @@ def make_paper_component(title, abst, url, rank):
             style=dict(
                 verticalAlign='top',
             ),
-        ),]),
+        ),
+        html.Span(
+            f"（{2021}年）",
+        )]),
         dbc.CardFooter(abst)
     ], style=dict(
         marginBottom='10px',
