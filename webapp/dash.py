@@ -151,7 +151,7 @@ paper_list = html.Div(
                 fontSize='2rem',
             ),
             className="display-5",
-            width=dict(size=6, offset=3)
+            width=dict(size=6, offset=3),
         ),
         word_addition_popover,
         html.Div(

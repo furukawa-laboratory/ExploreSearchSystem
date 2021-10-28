@@ -142,7 +142,8 @@ from scipy.spatial import distance as dist
 
 
 def make_paper_component(title, abst, url, rank):
-    return html.Div([
+    return dbc.Card([
+        dbc.CardBody([
         html.A(
             title,
             href=url,
@@ -155,9 +156,9 @@ def make_paper_component(title, abst, url, rank):
             style=dict(
                 verticalAlign='top',
             ),
-        ),
-        html.P(abst)
-    ])
+        ),]),
+        dbc.CardFooter(abst)
+    ], style=dict(marginButtom='10px',))
 
 
 @app.callback([
