@@ -73,12 +73,12 @@ make_search_component = lambda landing: dbc.Col([
                     {'label': '過去5年以内', 'value': 'YES'},
                 ],
                 id="published-date-limit",
-                className="h3",
                 value='NO',
+                style=dict(fontSize='0.8rem', height='100%'),
             ),
-            style=dict(height="50%", padding="10"),
             align="center",
             width=2,
+            style=dict(paddingLeft='5px', paddingRight='5px')
         ) if not landing else None),
         dbc.Col(
             dbc.Button(
@@ -96,6 +96,7 @@ make_search_component = lambda landing: dbc.Col([
     md=12,
     xl=8,
     className=f"card {'landing--search-form' if landing else ''}",
+
 )
 
 
