@@ -19,15 +19,6 @@ umatrix_modal = dbc.Modal([
 ], id="umatrix-modal", is_open=False, centered=True)
 
 
-# app.callback(
-#     Output('umatrix-modal', 'is_open'),
-#     [
-#         Input('open-umatrix-modal', 'n_clicks'),
-#         Input('close-umatrix-modal', 'n_clicks'),
-#     ],
-#     State('umatrix-modal', 'is_open'))(toggle_modal)
-
-
 link_card = dbc.Card([
     dbc.CardHeader("", id="card-text", className="h4"),
     html.P("", id="snippet-text", className="h5",style={"min-height":"100px"}),
@@ -192,11 +183,6 @@ main_layout = dbc.Container(children=[
     style={"min-height":"10vh", "margin-top":"10px"},
     align="center"),
     html.Hr(),
-    # umatrix_modal,
-    # dbc.Row([
-    #     view_options
-    #     ],
-    #     style={"min-height":"5vh"}),
     result_component,
     html.Hr(),
     paper_list,

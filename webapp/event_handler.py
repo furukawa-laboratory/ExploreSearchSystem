@@ -167,8 +167,6 @@ def make_paper_component(title, abst, url, rank):
 @app.callback([
         Output('paper-list-title', 'children'),
         Output('paper-list-components', 'children'),
-        # Output('paper-list-components', 'style'),
-        # Output('paper-list-title', 'style'),
         Output('paper-list', 'style'),
         Output('word-addition-popover', 'is_open'),
         Output('word-addition-popover-button', 'children'),
@@ -178,8 +176,6 @@ def make_paper_component(title, abst, url, rank):
         Input('word-map', 'clickData'),
     ],
     [
-        # State('paper-list-components', 'style'),
-        # State('paper-list-title', 'style'),
         State('paper-list', 'style'),
         State('memory', 'data'),
     ],
@@ -223,7 +219,7 @@ def make_paper_list(paperClickData, wordClickData, style, data):
         logger.debug(f"word_idx: {word_idx}")
         word = word_labels[word_idx[0]]
         title = f"{word} を多く含む論文"
-        popup_text = f"{word} を検索キーワードに追加して検索！"
+        popup_text = f"{word} を検索キーワードに追加！"
         target_nodes = (-y).flatten().argsort()[:3]
         logger.debug(f"target_nodes: {target_nodes}")
         paper_idxs = []
