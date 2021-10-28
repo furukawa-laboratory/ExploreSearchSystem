@@ -17,8 +17,9 @@ resolution = 10
 PAPER_COLOR = '#d3f284'
 WORD_COLOR = '#fffa73'
 
-def prepare_umatrix(keyword, X, Z1, Z2, sigma, labels, u_resolution):
-    umatrix_save_path = 'data/tmp/'+ keyword +'_umatrix_history.pickle'
+def prepare_umatrix(keyword, X, Z1, Z2, sigma, labels, u_resolution, within_5years):
+    within_5years_sign = '_within5y' if within_5years else ''
+    umatrix_save_path = 'data/tmp/'+ keyword + within_5years_sign + '_umatrix_history.pickle'
     if pathlib.Path(umatrix_save_path).exists():
         logger.debug("U-matix already calculated")
         with open(umatrix_save_path, 'rb') as f:
@@ -54,8 +55,9 @@ def prepare_umatrix(keyword, X, Z1, Z2, sigma, labels, u_resolution):
 
     return umatrix_history
 
-def prepare_materials(keyword, model_name):
+def prepare_materials(keyword, model_name, within_5years):
     logger.info(f"Preparing {keyword} map with {model_name}")
+    base_filename = f"{keyword}{'_within5y' if within_5years else ''}"
 
     # Learn model
     nb_epoch = 50
@@ -66,28 +68,28 @@ def prepare_materials(keyword, model_name):
     seed = 1
 
     # Load data
-    if pathlib.Path(keyword+".csv").exists():
+    if pathlib.Path(f"{base_filename}.csv").exists():
         logger.debug("Data exists")
-        csv_df = pd.read_csv(keyword+".csv")
+        csv_df = pd.read_csv(f"{base_filename}.csv")
         paper_labels = csv_df['site_name']
         rank = csv_df['ranking']
-        X = np.load("data/tmp/" + keyword + ".npy")
-        word_labels = np.load("data/tmp/" + keyword + "_label.npy")
+        X = np.load(f"data/tmp/{base_filename}.npy")
+        word_labels = np.load(f"data/tmp/{base_filename}_label.npy")
     else:
         logger.debug("Fetch data to learn")
-        csv_df = fetch_search_result(keyword)
+        csv_df = fetch_search_result(keyword, within_5years)
         paper_labels = csv_df['site_name']
         X , word_labels = make_bow(csv_df)
         rank = np.arange(1, X.shape[0]+1)  # FIXME
-        csv_df.to_csv(keyword+".csv")
-        feature_file = 'data/tmp/'+keyword+'.npy'
-        word_label_file = 'data/tmp/'+keyword+'_label.npy'
+        csv_df.to_csv(f"{base_filename}.csv")
+        feature_file = f'data/tmp/{base_filename}.npy'
+        word_label_file = f'data/tmp/{base_filename}_label.npy'
         np.save(feature_file, X)
         np.save(word_label_file, word_labels)
 
 
     labels = (paper_labels, word_labels)
-    model_save_path = 'data/tmp/'+ keyword +'_'+ model_name +'_history.pickle'
+    model_save_path = f'data/tmp/{base_filename}_history.pickle'
     if pathlib.Path(model_save_path).exists():
         logger.debug("Model already learned")
         with open(model_save_path, 'rb') as f:
@@ -119,7 +121,16 @@ def prepare_materials(keyword, model_name):
             pickle.dump(history, f)
 
     # ここの学習はCCPの描画が終わって結果をだしたあとに始めてもよさそう
-    umatrix_history = prepare_umatrix(keyword, X, history['Z1'], history['Z2'], history['sigma'], None, int(resolution**2))
+    umatrix_history = prepare_umatrix(
+        keyword,
+        X,
+        history['Z1'],
+        history['Z2'],
+        history['sigma'],
+        None,
+        int(resolution**2),
+        within_5years,
+    )
     return csv_df, labels, X, history, rank, umatrix_history
 
 
@@ -334,7 +345,7 @@ def make_figure(history, umatrix_hisotry, X, rank, labels, viewer_name='U_matrix
 
 
 def make_first_figure(viewer_id):
-    _, labels, X, history, rank, umatrix_hisotry = prepare_materials('Machine Learning', 'TSOM')
+    _, labels, X, history, rank, umatrix_hisotry = prepare_materials('Machine Learning', 'TSOM', False)
     return make_figure(history, umatrix_hisotry, X, rank, labels, 'U-matrix', viewer_id, None)
 
 
