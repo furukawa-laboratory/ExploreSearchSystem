@@ -16,6 +16,10 @@ from itertools import groupby
 resolution = 10
 PAPER_COLOR = '#d3f284'
 WORD_COLOR = '#fffa73'
+CCP_VIEWER = 'CCP'
+UMATRIX_VIEWER = 'U-matrix'
+TOPIC_VIEWER = 'topic'
+
 
 def prepare_umatrix(keyword, X, Z1, Z2, sigma, labels, u_resolution):
     umatrix_save_path = 'data/tmp/'+ keyword +'_umatrix_history.pickle'
@@ -192,7 +196,6 @@ def draw_topics(fig, Y, n_components, viewer_id):
 def draw_ccp(fig, Y, Zeta, resolution, clickedData, viewer_id):
     logger.debug('ccp')
     if viewer_id == 'viewer_1':
-        # viewer_1 ってことはviewer_2をクリックした．
         y = Y[:, get_bmu(Zeta, clickedData)].reshape(resolution, resolution)
     elif viewer_id == 'viewer_2':
         y = Y[get_bmu(Zeta, clickedData), :].reshape(resolution, resolution)
@@ -226,7 +229,6 @@ def draw_scatter(fig, Z, labels, rank, viewer_name):
             x=Z[:, 0],
             y=Z[:, 1],
             mode=f"markers+text",
-            name='lv',
             marker=dict(
                 size=rank[::-1],
                 sizemode='area',
@@ -290,22 +292,10 @@ def make_figure(history, umatrix_hisotry, X, rank, labels, viewer_name='U_matrix
     else:
         fig = draw_umatrix(fig, umatrix_hisotry, viewer_id)
 
-    # Show words when it is highlighted
-    # if viewer_id == 'viewer_2' and not clicked_z == None:
-    #     y = Y[get_bmu(history['Zeta'], clicked_z), :].flatten()
-    #     threshold = float(y.max() * 3 + y.min()) * 0.25  # top 25%
-    #     logger.debug(f"th:{threshold}")
-    #     labels = np.array(labels)
-    #     displayed_zeta = history['Zeta'][y > threshold]
-    #     invisible_z_idx = [idx for idx, z in enumerate(Z) if not np.all([np.invert(np.isclose(z, zeta)) for zeta in displayed_zeta]) ]
-    #     logger.debug(f"invisible_z_idx: {invisible_z_idx}")
-    #     labels[invisible_z_idx] = ''
     if viewer_id == 'viewer_2':
         _, unique_Z_idx = np.unique(Z, axis=0, return_index=True)
         logger.debug(unique_Z_idx)
         duplicated_Z_idx = np.setdiff1d(np.arange(Z.shape[0]), unique_Z_idx)
-        # group = groupby(duplicated_Z_idx, key=lambda i: tuple(Z[i]))
-        # invisible_Z_idx = [next(v) for v in group.values()]
         labels = np.array(labels)
         labels[duplicated_Z_idx] = ''
 
@@ -338,16 +328,22 @@ def make_first_figure(viewer_id):
     return make_figure(history, umatrix_hisotry, X, rank, labels, 'U-matrix', viewer_id, None)
 
 
-def draw_toi(fig, clickData=None):
+def draw_toi(fig, clickData, view_method):
     if not clickData:
         return fig
+
+    color = {
+        CCP_VIEWER: 'green',
+        UMATRIX_VIEWER: '#ffd700',
+        TOPIC_VIEWER: 'yellow',
+    }[view_method]
     radius = 0.15
     x, y = clickData['points'][0]['x'], clickData['points'][0]['y']
     fig.add_shape(
         type='circle',
         line=dict(
-            color='green',
-            width=3,
+            color=color,
+            width=5,
             dash='longdashdot',
         ),
         x0=(x - radius),
