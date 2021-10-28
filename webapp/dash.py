@@ -63,7 +63,6 @@ make_search_component = lambda landing: dbc.Col([
                 id=f'{"landing-" if landing else ""}search-form',
                 type="text",
                 placeholder="検索ワードを入力してください",
-                style=dict(width=f"{100 if landing else 80}%", fontSize="18px"),
                 className="form-control form-control-lg"),
             width=10,
         ),
