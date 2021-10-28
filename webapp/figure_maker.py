@@ -219,6 +219,7 @@ def get_bmu(Zeta, clickData):
 
 
 def draw_scatter(fig, Z, labels, rank, viewer_name):
+    rank = np.linspace(1, len(labels), len(labels))
     logger.debug(f"viewer_name: {viewer_name}")
     fig.add_trace(
         go.Scatter(
