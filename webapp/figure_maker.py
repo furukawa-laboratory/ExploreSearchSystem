@@ -12,7 +12,8 @@ from Grad_norm import Grad_Norm
 from webapp import logger
 
 
-resolution = 10
+resolution = 20
+u_resolution = 10
 PAPER_COLOR = '#d3f284'
 WORD_COLOR = '#fffa73'
 CCP_VIEWER = 'CCP'
@@ -122,7 +123,7 @@ def prepare_materials(keyword, model_name):
             pickle.dump(history, f)
 
     # ここの学習はCCPの描画が終わって結果をだしたあとに始めてもよさそう
-    umatrix_history = prepare_umatrix(keyword, X, history['Z1'], history['Z2'], history['sigma'], None, int(resolution**2))
+    umatrix_history = prepare_umatrix(keyword, X, history['Z1'], history['Z2'], history['sigma'], None, int(u_resolution**2))
     return csv_df, labels, X, history, rank, umatrix_history
 
 
