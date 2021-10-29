@@ -3,6 +3,7 @@ import numpy as np
 from tensorly.decomposition import parafac
 import jax
 import jax.numpy as jnp
+import gc
 
 
 cdist = lambda XA, XB: np.sum((XA[:, None] - XB[None, :])**2, axis=2)
@@ -100,6 +101,7 @@ class ManifoldModeling:
             self.history['sigma1'][epoch] = sigma1
             self.history['sigma2'][epoch] = sigma2
             self.history['sigma'][epoch] = sigma2
+        gc.collect()
 
 
 # @partial(jax.jit, static_argnums=(6, 7))
