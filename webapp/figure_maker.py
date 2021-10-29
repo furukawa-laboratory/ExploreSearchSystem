@@ -12,7 +12,7 @@ from Grad_norm import Grad_Norm
 from webapp import logger
 
 
-resolution = 20
+resolution = 10
 u_resolution = 10
 PAPER_COLOR = '#d3f284'
 WORD_COLOR = '#fffa73'
