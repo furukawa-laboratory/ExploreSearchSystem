@@ -5,12 +5,11 @@ from preprocessing_of_words import make_bow
 import numpy as np
 import pickle
 import plotly.graph_objects as go
-from tsom import ManifoldModeling as MM
+from jax_tsom import ManifoldModeling as MM
 from sklearn.decomposition import NMF
 from scipy.spatial import distance as dist
 from Grad_norm import Grad_Norm
 from webapp import logger
-from itertools import groupby
 
 
 resolution = 10

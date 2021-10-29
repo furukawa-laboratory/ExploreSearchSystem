@@ -3,7 +3,6 @@ import numpy as np
 from tensorly.decomposition import parafac
 import jax
 import jax.numpy as jnp
-from functools import partial
 
 
 cdist = lambda XA, XB: np.sum((XA[:, None] - XB[None, :])**2, axis=2)
