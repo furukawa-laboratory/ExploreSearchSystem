@@ -235,11 +235,13 @@ def get_bmu(Zeta, clickData):
 def draw_scatter(fig, Z, labels, rank, viewer_name):
     rank = np.linspace(1, len(labels), len(labels))
     logger.debug(f"viewer_name: {viewer_name}")
+
     fig.add_trace(
         go.Scatter(
             x=Z[:, 0],
             y=Z[:, 1],
             mode=f"markers+text",
+            name="",
             marker=dict(
                 size=rank[::-1],
                 sizemode='area',
@@ -252,6 +254,7 @@ def draw_scatter(fig, Z, labels, rank, viewer_name):
                 bgcolor="rgba(255, 255, 255, 0.75)",
             ),
             textposition='top center',
+            hovertemplate="<b>%{hovertext}</b>",
         )
     )
     return fig
