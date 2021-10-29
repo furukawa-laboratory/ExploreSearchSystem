@@ -129,7 +129,7 @@ result_component = dbc.Row(
     ],
     align="center",
     className="h-75",
-    style={"min-height": "60vh",},
+    style=dict(minHeight="60vh"),
     no_gutters=True
 )
 
@@ -199,7 +199,7 @@ main_layout = dbc.Container(children=[
         ),
         make_search_component(landing=False),
         ],
-    style={"min-height":"10vh", "margin-top":"10px"},
+    style=dict(minHeight="10vh", marginTop="10px"),
     align="center"),
     html.Hr(),
     result_component,
