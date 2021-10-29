@@ -242,10 +242,12 @@ def draw_scatter(fig, Z, labels, rank, viewer_name):
     rank = np.linspace(1, len(labels), len(labels))
     logger.debug(f"viewer_name: {viewer_name}")
     logger.debug(f"Z: {Z.shape}, labels:{len(labels)}, rank:{len(rank)}")
+    color = PAPER_COLORS[-1]
     if viewer_name == 'viewer_2':
         Z = Z[:word_num]
         labels = labels[:word_num]
         rank = rank[:word_num]
+        color = WORD_COLORS[-1]
 
     fig.add_trace(
         go.Scatter(
@@ -260,6 +262,11 @@ def draw_scatter(fig, Z, labels, rank, viewer_name):
                 sizemin=10,
             ),
             text=(labels if viewer_name == 'viewer_2' else rank),
+            textfont=dict(
+                family="sans serif",
+                size=10,
+                color='black'
+            ),
             hovertext=labels,
             hoverlabel=dict(
                 bgcolor="rgba(255, 255, 255, 0.75)",
@@ -268,6 +275,12 @@ def draw_scatter(fig, Z, labels, rank, viewer_name):
             hovertemplate="<b>%{hovertext}</b>",
         )
     )
+    # fig.add_annotation(
+    #     x=Z[:, 0],
+    #     y=Z[:, 1],
+    #     text=(labels if viewer_name == 'viewer_2' else list(map(lambda i: str(i), rank))),
+    #     showarrow=False,
+    #     yshift=10)
     return fig
 
 
