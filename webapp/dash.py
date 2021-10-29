@@ -102,12 +102,17 @@ make_search_component = lambda landing: dbc.Col([
 
 make_map = lambda id, viewer_id: dbc.Col(
     id=f'{id}-col',
-    children=dcc.Loading(
+    children=dcc.Loading([
         dcc.Graph(
             id=id,
             figure=make_first_figure(viewer_id),
             config=dict(displayModeBar=False),
         ),
+        html.Div(
+            id=f'{id}-loading-toggler',
+            style=dict(display=None),
+        )
+        ],
         id=f'{id}-loading',
     ),
     style={"height": "100%", "display":"none"},
@@ -124,7 +129,7 @@ result_component = dbc.Row(
     ],
     align="center",
     className="h-75",
-    style={"min-height": "60vh",},
+    style=dict(minHeight="60vh"),
     no_gutters=True
 )
 
@@ -194,7 +199,7 @@ main_layout = dbc.Container(children=[
         ),
         make_search_component(landing=False),
         ],
-    style={"min-height":"10vh", "margin-top":"10px"},
+    style=dict(minHeight="10vh", marginTop="10px"),
     align="center"),
     html.Hr(),
     result_component,
