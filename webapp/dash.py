@@ -19,15 +19,6 @@ umatrix_modal = dbc.Modal([
 ], id="umatrix-modal", is_open=False, centered=True)
 
 
-# app.callback(
-#     Output('umatrix-modal', 'is_open'),
-#     [
-#         Input('open-umatrix-modal', 'n_clicks'),
-#         Input('close-umatrix-modal', 'n_clicks'),
-#     ],
-#     State('umatrix-modal', 'is_open'))(toggle_modal)
-
-
 link_card = dbc.Card([
     dbc.CardHeader("", id="card-text", className="h4"),
     html.P("", id="snippet-text", className="h5",style={"min-height":"100px"}),
@@ -47,7 +38,6 @@ link_card = dbc.Card([
 
 
 view_options = dbc.Col([
-    dbc.Row(
         dbc.RadioItems(
             options=[
                 {'label': 'U-matrix 表示', 'value': 'U-matrix'},
@@ -57,14 +47,11 @@ view_options = dbc.Col([
             value='U-matrix',
             id="viewer-selector",
             inline=True,
-            className="h3",
+            className="",
         ),
-        style=dict(height="50%", padding="10"),
-        align="center",
-    )],
+    ],
     width=12,
-    style={"padding-left":"30px", "height": "50%"},
-    className="card",
+    style=dict(marginTop='10px', borderColor='white'),
 )
 
 
@@ -76,26 +63,40 @@ make_search_component = lambda landing: dbc.Col([
                 id=f'{"landing-" if landing else ""}search-form',
                 type="text",
                 placeholder="検索ワードを入力してください",
-                style=dict(width="100%", fontSize="18px"),
                 className="form-control form-control-lg"),
-            width=10,
+            width=(10 if landing else 8),
         ),
+        (dbc.Col(
+            dbc.Select(
+                options=[
+                    {'label': '期間指定なし', 'value': 'NO'},
+                    {'label': '過去5年以内', 'value': 'YES'},
+                ],
+                id="published-date-limit",
+                value='NO',
+                style=dict(fontSize='0.8rem', height='100%'),
+            ),
+            align="center",
+            width=2,
+            style=dict(paddingLeft='5px', paddingRight='5px')
+        ) if not landing else None),
         dbc.Col(
             dbc.Button(
                 id=f'{"landing-" if landing else ""}explore-start',
                 children="検索！",
                 color="primary",
                 className="btn btn-primary btn-lg",
+                style=dict(fontSize='0.8rem'),
             ),
             width=2,
-        ),
+        )], align="center"),
         view_options if not landing else None,
-        ],
-        align="center")],
+    ],
     style={"padding":"10px"},
     md=12,
     xl=8,
     className=f"card {'landing--search-form' if landing else ''}",
+
 )
 
 
@@ -135,10 +136,11 @@ word_addition_popover = dbc.Popover(
         id='word-addition-popover-button',
         children="検索！",
         className="btn btn-lg",
+        style=dict(fontSize='0.8rem')
     ),
     trigger='focus',
     className='bg-secondary',
-    style=dict(borderRight="#6c757d"),
+    style=dict(borderRight="#6c757d",),
 )
 
 
@@ -148,25 +150,29 @@ paper_list = html.Div(
         dbc.Col(
             id='paper-list-title',
             children="",
-            className="display-4",
             style=dict(
                 fontFamily="Oswald, sans-serif",
                 textAlign="center",
+                fontSize='2rem',
             ),
-            width=dict(size=6, offset=3)
+            className="display-5",
+            width=dict(size=6, offset=3),
         ),
         word_addition_popover,
-        html.Div(
+        dbc.Col(
             id='paper-list-components',
             children=[],
             style=dict(
-                borderWidth="10px",
-                borderColor="white",
-                borderStyle="solid",
-                borderRadius="5px",
             ),
+            width=dict(size=10, offset=1),
         ),
-    ]
+    ],
+    style=dict(
+        borderWidth="10px",
+        borderColor="white",
+        borderStyle="solid",
+        borderRadius="1.5vw",
+    )
 )
 
 
@@ -176,7 +182,7 @@ main_layout = dbc.Container(children=[
             html.H1(
                 id='title',
                 children='論文探索エンジン',
-                className="display-4",
+                className="display-5",
                 style=dict(
                     fontFamily="Oswald, sans-serif",
                     textAlign="center",
@@ -191,11 +197,6 @@ main_layout = dbc.Container(children=[
     style={"min-height":"10vh", "margin-top":"10px"},
     align="center"),
     html.Hr(),
-    # umatrix_modal,
-    # dbc.Row([
-    #     view_options
-    #     ],
-    #     style={"min-height":"5vh"}),
     result_component,
     html.Hr(),
     paper_list,
@@ -212,7 +213,7 @@ landing_page_layout = dbc.Container(
         ], className='landing--box'),
         html.H4(
             '論文探索エンジン',
-            className="landing--title"
+            className="landing--title",
         ),
         html.Div(
             children=[

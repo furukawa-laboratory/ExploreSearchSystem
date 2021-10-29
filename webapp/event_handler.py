@@ -18,16 +18,19 @@ from webapp.figure_maker import (
     [
         State('search-form', 'value'),
         State('memory', 'data'),
+        State('published-date-limit', 'value')
 ])
-def load_learning(n_clicks, n_clicks2, keyword, data):
+def load_learning(n_clicks, n_clicks2, keyword, data, within_5years):
+    within_5years = True if within_5years == 'YES' else False
     logger.info('load_learning called')
     keyword = keyword or "Machine Learning"
-    df, labels, X, history, rank, umatrix_hisotry = prepare_materials(keyword, 'TSOM')
+    df, labels, X, history, rank, umatrix_hisotry = prepare_materials(keyword, 'TSOM', within_5years)
     data = data or dict()
     data.update(
         snippet=df['snippet'].tolist(),
         url=df['URL'].tolist(),
         ranking=df['ranking'].tolist(),
+        year=df['year'].tolist(),
         history=history,
         umatrix_hisotry=umatrix_hisotry,
         X=X,
@@ -76,10 +79,10 @@ def draw_maps(_, viewer_name, p_clickData, w_clickData, data):
     X = np.array(X)
     paper_fig = make_figure(history, umatrix_hisotry, X, rank, labels, viewer_1_name, 'viewer_1', w_clickData)
     word_fig  = make_figure(history, umatrix_hisotry, X, rank, labels, viewer_2_name, 'viewer_2', p_clickData)
-    if viewer_1_name == 'CCP' and p_clickData:
-        paper_fig = draw_toi(paper_fig, p_clickData)
-    if viewer_2_name == 'CCP' and w_clickData:
-        word_fig = draw_toi(word_fig, w_clickData)
+    if viewer_2_name == 'CCP' and p_clickData:
+        paper_fig = draw_toi(paper_fig, p_clickData, viewer_1_name)
+    if viewer_1_name == 'CCP' and w_clickData:
+        word_fig = draw_toi(word_fig, w_clickData, viewer_2_name)
 
     return paper_fig, word_fig
 
@@ -112,7 +115,6 @@ def overwrite_search_form_value(n_clicks1, n_clicks2, popup_text, search_form, l
         Output('landing', 'style'),
         Output('paper-map-col', 'style'),
         Output('word-map-col', 'style'),
-        Output('viewer-selector', 'value'),
     ], [
         Input('landing-explore-start', 'n_clicks'),
     ], [
@@ -130,7 +132,7 @@ def make_page(n_clicks, keyword):
     paper_style['display'] = 'block'
     word_style['display'] = 'block'
 
-    return main_style, landing_style, paper_style, word_style, 'CCP'
+    return main_style, landing_style, paper_style, word_style
 
 
 
@@ -141,18 +143,36 @@ import numpy as np
 from scipy.spatial import distance as dist
 
 
-def make_paper_component(title, abst, url, rank):
-    return html.Div([
-        rank,
-        html.A(title, href=url, target='blank'),
-        html.P(abst)
-    ])
+def make_paper_component(title, abst, url, rank, year):
+    return dbc.Card([
+        dbc.CardBody([
+        html.A(
+            title,
+            href=url,
+            target='blank',
+            className='display-6 text-dark',
+            style=dict(fontSize='1.5rem')
+        ),
+        html.Span(
+            rank,
+            style=dict(
+                verticalAlign='top',
+            ),
+        ),
+        html.Span(
+            f"（{year}年）",
+        )]),
+        dbc.CardFooter(abst)
+    ], style=dict(
+        marginBottom='10px',
+        filter='drop-shadow(0px 8px 8px rgba(0, 0, 0, 0.25))',
+    ))
 
 
 @app.callback([
         Output('paper-list-title', 'children'),
         Output('paper-list-components', 'children'),
-        Output('paper-list-components', 'style'),
+        Output('paper-list', 'style'),
         Output('word-addition-popover', 'is_open'),
         Output('word-addition-popover-button', 'children'),
     ],
@@ -161,7 +181,7 @@ def make_paper_component(title, abst, url, rank):
         Input('word-map', 'clickData'),
     ],
     [
-        State('paper-list-components', 'style'),
+        State('paper-list', 'style'),
         State('memory', 'data'),
     ],
     prevent_initial_call=True
@@ -173,18 +193,12 @@ def make_paper_list(paperClickData, wordClickData, style, data):
     map_name = ctx.triggered[0]['prop_id'].split('.')[0]
     logger.info(f"map_name: {map_name}")
 
-    snippet = data['snippet']
-    urls = data['url']
-    ranking = data['ranking']
     history = data['history']
-    X = data['X']
-    labels = data['labels']
     logger.debug('learned data loaded.')
     history = {key: np.array(val) for key, val in history.items()}
-    X = np.array(X)
     Z2 = history['Z2']
-    paper_labels = labels[0]
-    word_labels = labels[1]
+
+    paper_labels, word_labels = data['labels']
     if map_name == 'paper-map':
         should_popover_open = False
         clicked_point = [[paperClickData['points'][0]['x'], paperClickData['points'][0]['y']]] if paperClickData else [[0, 0]]
@@ -204,7 +218,7 @@ def make_paper_list(paperClickData, wordClickData, style, data):
         logger.debug(f"word_idx: {word_idx}")
         word = word_labels[word_idx[0]]
         title = f"{word} を多く含む論文"
-        popup_text = f"{word} を検索キーワードに追加して検索！"
+        popup_text = f"{word} を検索キーワードに追加！"
         target_nodes = (-y).flatten().argsort()[:3]
         logger.debug(f"target_nodes: {target_nodes}")
         paper_idxs = []
@@ -217,8 +231,14 @@ def make_paper_list(paperClickData, wordClickData, style, data):
         paper_idxs = [idx for idx in paper_idxs if not (idx in seen or seen_add(idx))]
     logger.debug(f"Paper indexes {paper_idxs}")
     layout = [
-        make_paper_component(paper_labels[i], snippet[i], urls[i], ranking[i]) for i in paper_idxs
+        make_paper_component(
+            paper_labels[i],
+            data['snippet'][i],
+            data['url'][i],
+            data['ranking'][i],
+            data['year'][i]
+        ) for i in paper_idxs
     ]
-    style['borderColor'] = PAPER_COLOR if map_name == 'paper-map' else WORD_COLOR
+    style['backgroundColor'] = PAPER_COLOR if map_name == 'paper-map' else WORD_COLOR
 
     return title, layout, style, should_popover_open, popup_text
