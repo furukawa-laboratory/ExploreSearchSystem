@@ -132,7 +132,7 @@ def prepare_materials(keyword, model_name, within_5years):
         history['Z2'],
         history['sigma'],
         None,
-        int(u_resolution**2),
+        u_resolution,
         within_5years,
     )
     return csv_df, labels, X, history, rank, umatrix_history
