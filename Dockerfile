@@ -21,4 +21,4 @@ ENV PORT=${PORT}
 WORKDIR /app
 COPY . .
 
-CMD ["gunicorn", "app:server", "-w", "2", "--reload", "--timeout", "300"]
+CMD ["gunicorn", "app:server", "-w", "1", "--reload", "--timeout", "300"]
