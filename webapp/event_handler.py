@@ -17,13 +17,14 @@ from webapp.figure_maker import (
     ],
     [
         State('search-form', 'value'),
+        State('landing-search-form', 'value'),
         State('memory', 'data'),
         State('published-date-limit', 'value')
 ])
-def load_learning(n_clicks, n_clicks2, keyword, data, within_5years):
+def load_learning(n_clicks, n_clicks2, keyword, landing_keyword, data, within_5years):
     within_5years = True if within_5years == 'YES' else False
     logger.info('load_learning called')
-    keyword = keyword or "Machine Learning"
+    keyword = keyword or landing_keyword or "Machine Learning"
     df, labels, X, history, rank, umatrix_hisotry = prepare_materials(keyword, 'TSOM', within_5years)
     data = data or dict()
     data.update(
