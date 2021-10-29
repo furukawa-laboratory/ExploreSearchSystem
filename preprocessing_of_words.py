@@ -50,8 +50,7 @@ def make_bow(df):
 
     features = np.array(tfidf.todense())
 
-    word_num = 100
-    print('最小出現回数＝' + str(min(np.sum(X_array[:, :word_num], axis=0))))
+    word_num = 200
     word_order = np.argsort(np.sum(features, axis=0))[::-1]
     features = features[:, word_order][:, :word_num]
     word_label = word_label[word_order][:word_num]
