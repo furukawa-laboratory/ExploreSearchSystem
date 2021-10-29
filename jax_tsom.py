@@ -81,22 +81,22 @@ class ManifoldModeling:
         self.history['sigma2'] = np.zeros(nb_epoch)
         self.history['sigma'] = np.zeros(nb_epoch)
 
-        X = jnp.array(self.X)
-        Y = None
-        Z1 = jnp.array(self.Z1)
-        Z2 = jnp.array(self.Z2)
-        Zeta1 = jnp.array(self.Zeta1)
-        Zeta2 = jnp.array(self.Zeta2)
+        self.X = jnp.array(self.X)
+        self.Y = None
+        self.Z1 = jnp.array(self.Z1)
+        self.Z2 = jnp.array(self.Z2)
+        self.Zeta1 = jnp.array(self.Zeta1)
+        self.Zeta2 = jnp.array(self.Zeta2)
 
         for epoch in range(nb_epoch):
             # 学習量の決定
             sigma1 = max(self.SIGMA1_MIN, self.SIGMA1_MIN + (self.SIGMA1_MAX - self.SIGMA1_MIN) * (1 - (epoch / self.tau1)))
             sigma2 = max(self.SIGMA2_MIN, self.SIGMA2_MIN + (self.SIGMA2_MAX - self.SIGMA2_MIN) * (1 - (epoch / self.tau2)))
-            Y, Z1, Z2 = fit_once(X, Y, Z1, Z2, Zeta1, Zeta2, sigma1, sigma2)
+            self.Y, self.Z1, self.Z2 = fit_once(self.X, self.Y, self.Z1, self.Z2, self.Zeta1, self.Zeta2, sigma1, sigma2)
 
-            self.history['y'][epoch, :, :] = np.array(Y)
-            self.history['z1'][epoch, :] = np.array(Z1)
-            self.history['z2'][epoch, :] = np.array(Z2)
+            self.history['y'][epoch, :, :] = np.array(self.Y)
+            self.history['z1'][epoch, :] = np.array(self.Z1)
+            self.history['z2'][epoch, :] = np.array(self.Z2)
             self.history['sigma1'][epoch] = sigma1
             self.history['sigma2'][epoch] = sigma2
             self.history['sigma'][epoch] = sigma2
