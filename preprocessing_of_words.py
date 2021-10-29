@@ -13,12 +13,18 @@ nltk.download('averaged_perceptron_tagger')
 nltk.download('wordnet')
 
 
-def preprocessing_tag_and_stopwords(s):
+def preprocessing_tag_and_stopwords(s, include_adverb=False):
     lemmatizer = WordNetLemmatizer()
 
-    need_tag = [['NN', 'NNS', 'NNP', 'NNPS'],['VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ'],
-                ['JJ', 'JJR', 'JJS'], ['RB', 'RBR', 'RBS']]
-    p = ['n', 'v', 'a', 'r']  #'n':名詞，'v':動詞，'a':形容詞，'r':副詞
+    need_tag = [['NN', 'NNS', 'NNP', 'NNPS'], ['VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ'],
+                ['JJ', 'JJR', 'JJS']]
+    p = ['n', 'v', 'a']  # 'n':名詞，'v':動詞，'a':形容詞
+
+    if include_adverb is True:
+        need_tag = [['NN', 'NNS', 'NNP', 'NNPS'], ['VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ'],
+                    ['JJ', 'JJR', 'JJS'], ['RB', 'RBR', 'RBS']]
+        p = ['n', 'v', 'a', 'r']  # 'n':名詞，'v':動詞，'a':形容詞，'r':副詞
+
     stopWords = set(stopwords.words('english'))
 
     word = 'a'
@@ -39,7 +45,7 @@ def preprocessing_tag_and_stopwords(s):
 
 def make_bow(df):
     s = df['snippet']
-    pos = preprocessing_tag_and_stopwords(s)
+    pos = preprocessing_tag_and_stopwords(s, include_adverb=False)
 
     vectorizer = CountVectorizer(max_df=0.5, min_df=0.03)
     X = vectorizer.fit_transform(pos)
