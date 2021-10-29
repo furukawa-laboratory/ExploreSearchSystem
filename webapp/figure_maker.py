@@ -318,7 +318,6 @@ def make_figure(history, umatrix_hisotry, X, rank, labels, viewer_name='U_matrix
     )
     fig.update_layout(
         plot_bgcolor=(PAPER_COLOR if viewer_id == 'viewer_1' else WORD_COLOR),
-        ]
     )
     
 
