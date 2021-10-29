@@ -193,19 +193,12 @@ def make_paper_list(paperClickData, wordClickData, style, data):
     map_name = ctx.triggered[0]['prop_id'].split('.')[0]
     logger.info(f"map_name: {map_name}")
 
-    snippet = data['snippet']
-    urls = data['url']
-    ranking = data['ranking']
-    year = data['year']
     history = data['history']
-    X = data['X']
-    labels = data['labels']
     logger.debug('learned data loaded.')
     history = {key: np.array(val) for key, val in history.items()}
-    X = np.array(X)
     Z2 = history['Z2']
-    paper_labels = labels[0]
-    word_labels = labels[1]
+
+    paper_labels, word_labels = data['labels']
     if map_name == 'paper-map':
         should_popover_open = False
         clicked_point = [[paperClickData['points'][0]['x'], paperClickData['points'][0]['y']]] if paperClickData else [[0, 0]]
@@ -238,7 +231,13 @@ def make_paper_list(paperClickData, wordClickData, style, data):
         paper_idxs = [idx for idx in paper_idxs if not (idx in seen or seen_add(idx))]
     logger.debug(f"Paper indexes {paper_idxs}")
     layout = [
-        make_paper_component(paper_labels[i], snippet[i], urls[i], ranking[i], year[i]) for i in paper_idxs
+        make_paper_component(
+            paper_labels[i],
+            data['snippet'][i],
+            data['url'][i],
+            data['ranking'][i],
+            data['year'][i]
+        ) for i in paper_idxs
     ]
     style['backgroundColor'] = PAPER_COLOR if map_name == 'paper-map' else WORD_COLOR
 
