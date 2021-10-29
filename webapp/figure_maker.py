@@ -227,7 +227,6 @@ def draw_scatter(fig, Z, labels, rank, viewer_name):
             x=Z[:, 0],
             y=Z[:, 1],
             mode=f"markers+text",
-            name='lv',
             marker=dict(
                 size=rank[::-1],
                 sizemode='area',
@@ -285,12 +284,7 @@ def make_figure(history, umatrix_hisotry, X, rank, labels, viewer_name='U_matrix
             ),
         ),
     )
-
-    fig.add_trace(
-        go.Scatter(
-            x=[x1, x1, x2, x2], y=[y1, y2, y2, y1], fill="toself"
-        )
-    )
+    
     if viewer_name == "topic":
         n_components = 5
         fig = draw_topics(fig, Y, n_components, viewer_id)
@@ -298,7 +292,7 @@ def make_figure(history, umatrix_hisotry, X, rank, labels, viewer_name='U_matrix
         fig = draw_ccp(fig, Y, history['Zeta'], history['resolution'], clicked_z, viewer_id)
     else:
         fig = draw_umatrix(fig, umatrix_hisotry, viewer_id)
-
+    
     # Show words when it is highlighted
     # if viewer_id == 'viewer_2' and not clicked_z == None:
     #     y = Y[get_bmu(history['Zeta'], clicked_z), :].flatten()
