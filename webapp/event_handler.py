@@ -180,6 +180,7 @@ def make_paper_component(title, abst, url, rank, year):
     [
         Input('paper-map', 'clickData'),
         Input('word-map', 'clickData'),
+        Input('explore-start', 'n_clicks'),
     ],
     [
         State('paper-list', 'style'),
@@ -187,12 +188,12 @@ def make_paper_component(title, abst, url, rank, year):
     ],
     prevent_initial_call=True
 )
-def make_paper_list(paperClickData, wordClickData, style, data):
+def make_paper_list(paperClickData, wordClickData, n_clicks, style, data):
     logger.debug('make_paper_list')
 
     ctx = dash.callback_context
-    map_name = ctx.triggered[0]['prop_id'].split('.')[0]
-    logger.info(f"map_name: {map_name}")
+    component_name = ctx.triggered[0]['prop_id'].split('.')[0]
+    logger.info(f"component_name: {component_name}")
 
     history = data['history']
     logger.debug('learned data loaded.')
@@ -200,7 +201,15 @@ def make_paper_list(paperClickData, wordClickData, style, data):
     Z2 = history['Z2']
 
     paper_labels, word_labels = data['labels']
-    if map_name == 'paper-map':
+    if component_name == 'explore-start':
+        default_style = dict(
+            borderWidth="10px",
+            borderColor="white",
+            borderStyle="solid",
+            borderRadius="1.5vw",
+        )
+        return "", [], default_style, False, ""
+    elif component_name == 'paper-map':
         should_popover_open = False
         clicked_point = [[paperClickData['points'][0]['x'], paperClickData['points'][0]['y']]] if paperClickData else [[0, 0]]
         clicked_point = np.array(clicked_point)
@@ -240,6 +249,6 @@ def make_paper_list(paperClickData, wordClickData, style, data):
             data['year'][i]
         ) for i in paper_idxs
     ]
-    style['backgroundColor'] = PAPER_COLOR if map_name == 'paper-map' else WORD_COLOR
+    style['backgroundColor'] = PAPER_COLOR if component_name == 'paper-map' else WORD_COLOR
 
     return title, layout, style, should_popover_open, popup_text
