@@ -214,7 +214,7 @@ def make_paper_list(paperClickData, wordClickData, n_clicks, style, data):
         clicked_point = [[paperClickData['points'][0]['x'], paperClickData['points'][0]['y']]] if paperClickData else [[0, 0]]
         clicked_point = np.array(clicked_point)
         dists = dist.cdist(history['Z1'], clicked_point)
-        paper_idxs = np.argsort(dists, axis=0)[:3].flatten()
+        paper_idxs = np.argsort(dists, axis=0)[:5].flatten()
         title = "クリックした付近の論文"
         popup_text = ''
     else:
