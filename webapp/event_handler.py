@@ -6,6 +6,7 @@ from webapp.figure_maker import (
     PAPER_COLOR, WORD_COLOR, draw_toi,
 )
 
+
 @app.callback([
         Output('memory', 'data'),
         Output('paper-map-loading', 'loading-state'),

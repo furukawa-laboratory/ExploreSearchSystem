@@ -11,6 +11,7 @@ from scipy.spatial import distance as dist
 from Grad_norm import Grad_Norm
 from webapp import logger
 
+
 resolution = 10
 u_resolution = 10
 word_num = 200
@@ -58,6 +59,7 @@ def prepare_umatrix(keyword, X, Z1, Z2, sigma, labels, u_resolution, within_5yea
             pickle.dump(umatrix_history, f)
 
     return umatrix_history
+
 
 def prepare_materials(keyword, model_name, within_5years):
     logger.info(f"Preparing {keyword} map with {model_name}")
@@ -305,7 +307,7 @@ def make_figure(history, umatrix_hisotry, X, rank, labels, viewer_name='U_matrix
             ),
         ),
     )
-    
+
     if viewer_name == "topic":
         n_components = 5
         fig = draw_topics(fig, Y, n_components, viewer_id)
@@ -328,7 +330,7 @@ def make_figure(history, umatrix_hisotry, X, rank, labels, viewer_name='U_matrix
     fig.update_layout(
         plot_bgcolor=(PAPER_COLOR if viewer_id == 'viewer_1' else WORD_COLOR),
     )
-    
+
 
     fig.update(
         layout_coloraxis_showscale=False,

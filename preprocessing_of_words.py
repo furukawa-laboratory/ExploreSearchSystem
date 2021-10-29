@@ -3,7 +3,7 @@ from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
 from nltk.stem import WordNetLemmatizer
-import pandas as pd
+import gc
 import numpy as np
 
 
@@ -36,12 +36,15 @@ def preprocessing_tag_and_stopwords(s):
         pos.append(''.join(l_new))
     return pos
 
+
 def make_bow(df):
     s = df['snippet']
     pos = preprocessing_tag_and_stopwords(s)
 
     vectorizer = CountVectorizer(max_df=0.5, min_df=0.03)
     X = vectorizer.fit_transform(pos)
+    del pos
+    gc.collect()
     X_array = X.toarray()
     word_label = np.array(vectorizer.get_feature_names())
     # Tfidf
