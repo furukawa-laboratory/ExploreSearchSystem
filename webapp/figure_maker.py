@@ -18,6 +18,8 @@ WORD_COLOR = '#fffa73'
 CCP_VIEWER = 'CCP'
 UMATRIX_VIEWER = 'U-matrix'
 TOPIC_VIEWER = 'topic'
+gcolors =  [[255, 255, 180], [255, 250, 115], [231, 223, 37]]
+ycolors =  [[255, 255, 180], [255, 250, 115], [231, 223, 37]]
 
 
 def prepare_umatrix(keyword, X, Z1, Z2, sigma, labels, u_resolution, within_5years):
@@ -122,7 +124,6 @@ def prepare_materials(keyword, model_name, within_5years):
         with open(model_save_path, 'wb') as f:
             pickle.dump(history, f)
 
-    # ここの学習はCCPの描画が終わって結果をだしたあとに始めてもよさそう
     umatrix_history = prepare_umatrix(
         keyword,
         X,
@@ -169,7 +170,6 @@ def draw_topics(fig, Y, n_components, viewer_id):
     W = model_t3.fit_transform(Y)
     if viewer_id == 'viewer_2':
         W = model_t3.components_.T
-        # 意味としては,H = model_t3.components_.T
 
     # For mask and normalization(min:0, max->1)
     mask_std = np.zeros(W.shape)
@@ -207,15 +207,18 @@ def draw_ccp(fig, Y, Zeta, resolution, clickedData, viewer_id):
     logger.debug('ccp')
     if viewer_id == 'viewer_1':
         y = Y[:, get_bmu(Zeta, clickedData)].reshape(resolution, resolution)
+        colors = [[255, 255, 180], [211, 242, 132], [144, 208, 80]]
     elif viewer_id == 'viewer_2':
         y = Y[get_bmu(Zeta, clickedData), :].reshape(resolution, resolution)
+        colors =  [[255, 255, 180], [255, 250, 115], [231, 223, 37]]
+    color_scale = list(map(lambda i: 'rgb({},{},{})'.format(*i), colors))
     fig.add_trace(
         go.Contour(
             x=np.linspace(-1, 1, resolution),
             y=np.linspace(-1, 1, resolution),
             z=y,
             name='contour',
-            colorscale='brwnyl',
+            colorscale=color_scale,
             hoverinfo='skip',
             showscale=False,
         )
