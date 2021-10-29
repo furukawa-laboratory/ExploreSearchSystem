@@ -57,6 +57,14 @@ def make_bow(df):
     return features, word_label
 
 if __name__ == '__main__':
+    from fetch_arxiv import fetch_search_result
+    import time
+
+    search_str = input("> ")
+
+    start = time.time()
+    df = fetch_search_result(search_str)
+    duration = time.time() - start
+    print(f"duration: {duration}s")
     # Load file
-    csv_df = pd.read_csv("~/Downloads/Unsupervised Kernel Regression.csv")
-    features, word_label = make_bow(csv_df)
+    features, word_label = make_bow(df)
