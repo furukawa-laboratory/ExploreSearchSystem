@@ -9,7 +9,7 @@ def fetch_search_result(search_query, within_5years=False):
 
     search = arxiv.Search(
         query=search_query,
-        max_results=max_results * (5 if within_5years else 1),
+        max_results=max_results * (3 if within_5years else 1),
     )
     titles = []
     absts = []

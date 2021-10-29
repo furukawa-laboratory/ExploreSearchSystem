@@ -249,10 +249,10 @@ def draw_scatter(fig, Z, labels, rank, viewer_name):
             mode=f"markers+text",
             name="",
             marker=dict(
-                size=rank[::-1],
+                size=(rank[::-1])*(1 if viewer_name == 'viewer_1' else 0.5),
                 sizemode='area',
                 sizeref=2. * max(rank) / (40. ** 2),
-                sizemin=4,
+                sizemin=10,
             ),
             text=(labels if viewer_name == 'viewer_2' else rank),
             hovertext=labels,
