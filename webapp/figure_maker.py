@@ -14,6 +14,7 @@ from webapp import logger
 
 resolution = 10
 u_resolution = 10
+word_num = 200
 PAPER_COLOR = '#d3f284'
 WORD_COLOR = '#fffa73'
 CCP_VIEWER = 'CCP'
@@ -235,6 +236,11 @@ def get_bmu(Zeta, clickData):
 def draw_scatter(fig, Z, labels, rank, viewer_name):
     rank = np.linspace(1, len(labels), len(labels))
     logger.debug(f"viewer_name: {viewer_name}")
+    logger.debug(f"Z: {Z.shape}, labels:{len(labels)}, rank:{len(rank)}")
+    if viewer_name == 'viewer_2':
+        Z = Z[:word_num]
+        labels = labels[:word_num]
+        rank = rank[:word_num]
 
     fig.add_trace(
         go.Scatter(
