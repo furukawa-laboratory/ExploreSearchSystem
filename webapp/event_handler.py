@@ -227,7 +227,7 @@ def make_paper_list(paperClickData, wordClickData, n_clicks, style, data):
         word_idx = np.argmin(dist.cdist(Z2, history['Zeta'][bmu][None, :]), axis=0)
         logger.debug(f"word_idx: {word_idx}")
         word = word_labels[word_idx[0]]
-        title = f"{word} を多く含む論文"
+        title = f"{word} 付近の単語を含む論文"
         popup_text = f"{word} を検索キーワードに追加！"
         target_nodes = (-y).flatten().argsort()[:3]
         logger.debug(f"target_nodes: {target_nodes}")
