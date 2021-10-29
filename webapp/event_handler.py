@@ -82,9 +82,9 @@ def draw_maps(_, viewer_name, p_clickData, w_clickData, data):
     paper_fig = make_figure(history, umatrix_hisotry, X, rank, labels, viewer_1_name, 'viewer_1', w_clickData)
     word_fig  = make_figure(history, umatrix_hisotry, X, rank, labels, viewer_2_name, 'viewer_2', p_clickData)
     if viewer_2_name == 'CCP' and p_clickData:
-        paper_fig = draw_toi(paper_fig, p_clickData, viewer_1_name)
+        paper_fig = draw_toi(paper_fig, p_clickData, viewer_1_name, 'viewer_1')
     if viewer_1_name == 'CCP' and w_clickData:
-        word_fig = draw_toi(word_fig, w_clickData, viewer_2_name)
+        word_fig = draw_toi(word_fig, w_clickData, viewer_2_name, 'viewer_2')
 
     return paper_fig, word_fig
 
@@ -137,8 +137,6 @@ def make_page(n_clicks, keyword):
     return main_style, landing_style, paper_style, word_style
 
 
-
-import dash
 import dash_bootstrap_components as dbc
 import dash_html_components as html
 import numpy as np

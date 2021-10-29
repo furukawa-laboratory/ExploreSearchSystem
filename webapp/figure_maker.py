@@ -15,11 +15,15 @@ from webapp import logger
 resolution = 10
 u_resolution = 10
 word_num = 200
-PAPER_COLOR = '#d3f284'
-WORD_COLOR = '#fffa73'
 CCP_VIEWER = 'CCP'
 UMATRIX_VIEWER = 'U-matrix'
 TOPIC_VIEWER = 'topic'
+ycolors =  [[255, 255, 230], [255, 255, 180], [255, 253, 140], [255, 250, 115], [255, 235, 80], [231, 223, 37], [210, 200, 5], [155, 148, 15]]
+gcolors = [[255, 255, 230], [255, 255, 180], [230, 247, 155], [211, 242, 132], [180, 220, 110], [144, 208, 80], [120, 180, 75]]
+PAPER_COLORS = list(map(lambda i: 'rgb({},{},{})'.format(*i), gcolors))
+WORD_COLORS = list(map(lambda i: 'rgb({},{},{})'.format(*i), ycolors))
+PAPER_COLOR = PAPER_COLORS[3]
+WORD_COLOR = WORD_COLORS[3]
 
 
 def prepare_umatrix(keyword, X, Z1, Z2, sigma, labels, u_resolution, within_5years):
@@ -125,7 +129,6 @@ def prepare_materials(keyword, model_name, within_5years):
         with open(model_save_path, 'wb') as f:
             pickle.dump(history, f)
 
-    # ここの学習はCCPの描画が終わって結果をだしたあとに始めてもよさそう
     umatrix_history = prepare_umatrix(
         keyword,
         X,
@@ -172,7 +175,6 @@ def draw_topics(fig, Y, n_components, viewer_id):
     W = model_t3.fit_transform(Y)
     if viewer_id == 'viewer_2':
         W = model_t3.components_.T
-        # 意味としては,H = model_t3.components_.T
 
     # For mask and normalization(min:0, max->1)
     mask_std = np.zeros(W.shape)
@@ -210,15 +212,17 @@ def draw_ccp(fig, Y, Zeta, resolution, clickedData, viewer_id):
     logger.debug('ccp')
     if viewer_id == 'viewer_1':
         y = Y[:, get_bmu(Zeta, clickedData)].reshape(resolution, resolution)
+        colors = WORD_COLORS 
     elif viewer_id == 'viewer_2':
         y = Y[get_bmu(Zeta, clickedData), :].reshape(resolution, resolution)
+        colors = PAPER_COLORS
     fig.add_trace(
         go.Contour(
             x=np.linspace(-1, 1, resolution),
             y=np.linspace(-1, 1, resolution),
             z=y,
             name='contour',
-            colorscale='brwnyl',
+            colorscale=colors,
             hoverinfo='skip',
             showscale=False,
         )
@@ -238,10 +242,12 @@ def draw_scatter(fig, Z, labels, rank, viewer_name):
     rank = np.linspace(1, len(labels), len(labels))
     logger.debug(f"viewer_name: {viewer_name}")
     logger.debug(f"Z: {Z.shape}, labels:{len(labels)}, rank:{len(rank)}")
+    color = PAPER_COLORS[-1]
     if viewer_name == 'viewer_2':
         Z = Z[:word_num]
         labels = labels[:word_num]
         rank = rank[:word_num]
+        color = WORD_COLORS[-1]
 
     fig.add_trace(
         go.Scatter(
@@ -256,6 +262,11 @@ def draw_scatter(fig, Z, labels, rank, viewer_name):
                 sizemin=10,
             ),
             text=(labels if viewer_name == 'viewer_2' else rank),
+            textfont=dict(
+                family="sans serif",
+                size=10,
+                color='black'
+            ),
             hovertext=labels,
             hoverlabel=dict(
                 bgcolor="rgba(255, 255, 255, 0.75)",
@@ -264,6 +275,12 @@ def draw_scatter(fig, Z, labels, rank, viewer_name):
             hovertemplate="<b>%{hovertext}</b>",
         )
     )
+    # fig.add_annotation(
+    #     x=Z[:, 0],
+    #     y=Z[:, 1],
+    #     text=(labels if viewer_name == 'viewer_2' else list(map(lambda i: str(i), rank))),
+    #     showarrow=False,
+    #     yshift=10)
     return fig
 
 
@@ -351,7 +368,7 @@ def make_first_figure(viewer_id):
     return make_figure(history, umatrix_hisotry, X, rank, labels, 'U-matrix', viewer_id, None)
 
 
-def draw_toi(fig, clickData, view_method):
+def draw_toi(fig, clickData, view_method, viewer_id):
     if not clickData:
         return fig
 
@@ -360,14 +377,25 @@ def draw_toi(fig, clickData, view_method):
         UMATRIX_VIEWER: '#ffd700',
         TOPIC_VIEWER: 'yellow',
     }[view_method]
-    radius = 0.15
+    color = PAPER_COLORS if viewer_id == 'viewer_1' else WORD_COLORS
     x, y = clickData['points'][0]['x'], clickData['points'][0]['y']
+    radius = 0.15
     fig.add_shape(
         type='circle',
         line=dict(
-            color=color,
+            color=color[0],
+            width=9.0,
+        ),
+        x0=(x - radius),
+        y0=(y - radius),
+        x1=(x + radius),
+        y1=(y + radius),
+    )
+    fig.add_shape(
+        type='circle',
+        line=dict(
+            color=color[-1],
             width=5,
-            dash='longdashdot',
         ),
         x0=(x - radius),
         y0=(y - radius),
