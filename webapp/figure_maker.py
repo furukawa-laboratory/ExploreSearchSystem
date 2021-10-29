@@ -13,13 +13,15 @@ from webapp import logger
 
 resolution = 10
 u_resolution = 10
-PAPER_COLOR = '#d3f284'
-WORD_COLOR = '#fffa73'
 CCP_VIEWER = 'CCP'
 UMATRIX_VIEWER = 'U-matrix'
 TOPIC_VIEWER = 'topic'
-gcolors =  [[255, 255, 180], [255, 250, 115], [231, 223, 37]]
-ycolors =  [[255, 255, 180], [255, 250, 115], [231, 223, 37]]
+ycolors =  [[255, 255, 230], [255, 255, 180], [255, 253, 140], [255, 250, 115], [255, 235, 80], [231, 223, 37], [210, 200, 5], [155, 148, 15]]
+gcolors = [[255, 255, 230], [255, 255, 180], [230, 247, 155], [211, 242, 132], [180, 220, 110], [144, 208, 80], [120, 180, 75]]
+PAPER_COLORS = list(map(lambda i: 'rgb({},{},{})'.format(*i), gcolors))
+WORD_COLORS = list(map(lambda i: 'rgb({},{},{})'.format(*i), ycolors))
+PAPER_COLOR = PAPER_COLORS[3]
+WORD_COLOR = WORD_COLORS[3]
 
 
 def prepare_umatrix(keyword, X, Z1, Z2, sigma, labels, u_resolution, within_5years):
@@ -207,18 +209,17 @@ def draw_ccp(fig, Y, Zeta, resolution, clickedData, viewer_id):
     logger.debug('ccp')
     if viewer_id == 'viewer_1':
         y = Y[:, get_bmu(Zeta, clickedData)].reshape(resolution, resolution)
-        colors = [[255, 255, 180], [211, 242, 132], [144, 208, 80]]
+        colors = WORD_COLORS 
     elif viewer_id == 'viewer_2':
         y = Y[get_bmu(Zeta, clickedData), :].reshape(resolution, resolution)
-        colors =  [[255, 255, 180], [255, 250, 115], [231, 223, 37]]
-    color_scale = list(map(lambda i: 'rgb({},{},{})'.format(*i), colors))
+        colors = PAPER_COLORS
     fig.add_trace(
         go.Contour(
             x=np.linspace(-1, 1, resolution),
             y=np.linspace(-1, 1, resolution),
             z=y,
             name='contour',
-            colorscale=color_scale,
+            colorscale=colors,
             hoverinfo='skip',
             showscale=False,
         )
@@ -343,7 +344,7 @@ def make_first_figure(viewer_id):
     return make_figure(history, umatrix_hisotry, X, rank, labels, 'U-matrix', viewer_id, None)
 
 
-def draw_toi(fig, clickData, view_method):
+def draw_toi(fig, clickData, view_method, viewer_id):
     if not clickData:
         return fig
 
@@ -352,14 +353,52 @@ def draw_toi(fig, clickData, view_method):
         UMATRIX_VIEWER: '#ffd700',
         TOPIC_VIEWER: 'yellow',
     }[view_method]
-    radius = 0.15
+    color = PAPER_COLORS if viewer_id == 'viewer_1' else WORD_COLORS
+    radius = 0.11
     x, y = clickData['points'][0]['x'], clickData['points'][0]['y']
+    # fig.add_shape(
+    #     type='circle',
+    #     line=dict(
+    #         color=color[-1],
+    #         width=3.0,
+    #         dash='longdashdot',
+    #     ),
+    #     x0=(x - radius),
+    #     y0=(y - radius),
+    #     x1=(x + radius),
+    #     y1=(y + radius),
+    # )
+    # radius = 0.15
+    # fig.add_shape(
+    #     type='circle',
+    #     line=dict(
+    #         color=color[-1],
+    #         width=3.0,
+    #         dash='longdashdot',
+    #     ),
+    #     x0=(x - radius),
+    #     y0=(y - radius),
+    #     x1=(x + radius),
+    #     y1=(y + radius),
+    # )
     fig.add_shape(
         type='circle',
         line=dict(
-            color=color,
+            color=color[0],
+            width=9.0,
+            # dash='longdashdot',
+        ),
+        x0=(x - radius),
+        y0=(y - radius),
+        x1=(x + radius),
+        y1=(y + radius),
+    )
+    fig.add_shape(
+        type='circle',
+        line=dict(
+            color=color[-1],
             width=5,
-            dash='longdashdot',
+            # dash='longdashdot',
         ),
         x0=(x - radius),
         y0=(y - radius),
