@@ -17,13 +17,14 @@ from webapp.figure_maker import (
     ],
     [
         State('search-form', 'value'),
+        State('landing-search-form', 'value'),
         State('memory', 'data'),
         State('published-date-limit', 'value')
 ])
-def load_learning(n_clicks, n_clicks2, keyword, data, within_5years):
+def load_learning(n_clicks, n_clicks2, keyword, landing_keyword, data, within_5years):
     within_5years = True if within_5years == 'YES' else False
     logger.info('load_learning called')
-    keyword = keyword or "Machine Learning"
+    keyword = keyword or landing_keyword or "Machine Learning"
     df, labels, X, history, rank, umatrix_hisotry = prepare_materials(keyword, 'TSOM', within_5years)
     data = data or dict()
     data.update(
@@ -179,6 +180,7 @@ def make_paper_component(title, abst, url, rank, year):
     [
         Input('paper-map', 'clickData'),
         Input('word-map', 'clickData'),
+        Input('explore-start', 'n_clicks'),
     ],
     [
         State('paper-list', 'style'),
@@ -186,12 +188,12 @@ def make_paper_component(title, abst, url, rank, year):
     ],
     prevent_initial_call=True
 )
-def make_paper_list(paperClickData, wordClickData, style, data):
+def make_paper_list(paperClickData, wordClickData, n_clicks, style, data):
     logger.debug('make_paper_list')
 
     ctx = dash.callback_context
-    map_name = ctx.triggered[0]['prop_id'].split('.')[0]
-    logger.info(f"map_name: {map_name}")
+    component_name = ctx.triggered[0]['prop_id'].split('.')[0]
+    logger.info(f"component_name: {component_name}")
 
     history = data['history']
     logger.debug('learned data loaded.')
@@ -199,12 +201,20 @@ def make_paper_list(paperClickData, wordClickData, style, data):
     Z2 = history['Z2']
 
     paper_labels, word_labels = data['labels']
-    if map_name == 'paper-map':
+    if component_name == 'explore-start':
+        default_style = dict(
+            borderWidth="10px",
+            borderColor="white",
+            borderStyle="solid",
+            borderRadius="1.5vw",
+        )
+        return "", [], default_style, False, ""
+    elif component_name == 'paper-map':
         should_popover_open = False
         clicked_point = [[paperClickData['points'][0]['x'], paperClickData['points'][0]['y']]] if paperClickData else [[0, 0]]
         clicked_point = np.array(clicked_point)
         dists = dist.cdist(history['Z1'], clicked_point)
-        paper_idxs = np.argsort(dists, axis=0)[:3].flatten()
+        paper_idxs = np.argsort(dists, axis=0)[:5].flatten()
         title = "クリックした付近の論文"
         popup_text = ''
     else:
@@ -217,7 +227,7 @@ def make_paper_list(paperClickData, wordClickData, style, data):
         word_idx = np.argmin(dist.cdist(Z2, history['Zeta'][bmu][None, :]), axis=0)
         logger.debug(f"word_idx: {word_idx}")
         word = word_labels[word_idx[0]]
-        title = f"{word} を多く含む論文"
+        title = f"{word} 付近の単語を含む論文"
         popup_text = f"{word} を検索キーワードに追加！"
         target_nodes = (-y).flatten().argsort()[:3]
         logger.debug(f"target_nodes: {target_nodes}")
@@ -239,6 +249,6 @@ def make_paper_list(paperClickData, wordClickData, style, data):
             data['year'][i]
         ) for i in paper_idxs
     ]
-    style['backgroundColor'] = PAPER_COLOR if map_name == 'paper-map' else WORD_COLOR
+    style['backgroundColor'] = PAPER_COLOR if component_name == 'paper-map' else WORD_COLOR
 
     return title, layout, style, should_popover_open, popup_text
