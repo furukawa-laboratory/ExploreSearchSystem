@@ -11,7 +11,6 @@ from scipy.spatial import distance as dist
 from Grad_norm import Grad_Norm
 from webapp import logger
 
-
 resolution = 10
 u_resolution = 10
 PAPER_COLOR = '#d3f284'
@@ -51,7 +50,7 @@ def prepare_umatrix(keyword, X, Z1, Z2, sigma, labels, u_resolution, within_5yea
         umatrix_history = dict(
             umatrix1=U_matrix1.reshape(u_resolution, u_resolution),
             umatrix2=U_matrix2.reshape(u_resolution, u_resolution),
-            zeta = np.linspace(-1, 1, u_resolution),
+            zeta=np.linspace(-1, 1, u_resolution),
         )
         logger.debug("Calculating finished.")
         with open(umatrix_save_path, 'wb') as f:
@@ -90,7 +89,6 @@ def prepare_materials(keyword, model_name, within_5years):
         word_label_file = f'data/tmp/{base_filename}_label.npy'
         np.save(feature_file, X)
         np.save(word_label_file, word_labels)
-
 
     labels = (paper_labels, word_labels)
     model_save_path = f'data/tmp/{base_filename}_history.pickle'
@@ -179,7 +177,7 @@ def draw_topics(fig, Y, n_components, viewer_id):
     for i, max_k in enumerate(mask):
         mask_std[i, max_k] = 1 / np.max(W)
     W_mask_std = W * mask_std
-    DEFAULT_PLOTLY_COLORS=[
+    DEFAULT_PLOTLY_COLORS = [
         'rgb(31, 119, 180)', 'rgb(255, 127, 14)',
         'rgb(44, 160, 44)', 'rgb(214, 39, 40)',
         'rgb(148, 103, 189)', 'rgb(140, 86, 75)',
@@ -187,7 +185,7 @@ def draw_topics(fig, Y, n_components, viewer_id):
         'rgb(188, 189, 34)', 'rgb(23, 190, 207)'
     ]
     alpha = 0.1
-    DPC_with_Alpha = [k[:-1]+', '+str(alpha)+k[-1:] for k in DEFAULT_PLOTLY_COLORS]
+    DPC_with_Alpha = [k[:-1] + ', ' + str(alpha) + k[-1:] for k in DEFAULT_PLOTLY_COLORS]
     for i in range(n_components):
         fig.add_trace(
             go.Contour(
@@ -196,13 +194,14 @@ def draw_topics(fig, Y, n_components, viewer_id):
                 z=W_mask_std[:, i].reshape(resolution, resolution),
                 name='contour',
                 colorscale=[
-                [0, "rgba(0, 0, 0,0)"],
-                [1.0, DPC_with_Alpha[i]]],
+                    [0, "rgba(0, 0, 0,0)"],
+                    [1.0, DPC_with_Alpha[i]]],
                 hoverinfo='skip',
                 showscale=False,
             )
         )
     return fig
+
 
 def draw_ccp(fig, Y, Zeta, resolution, clickedData, viewer_id):
     logger.debug('ccp')
@@ -260,10 +259,10 @@ def draw_scatter(fig, Z, labels, rank, viewer_name):
 def make_figure(history, umatrix_hisotry, X, rank, labels, viewer_name='U_matrix', viewer_id=None, clicked_z=None):
     logger.debug(viewer_id)
     if viewer_id == 'viewer_1':
-        Z, Y, sigma = history['Z1'], history['Y'], history['sigma']
+        Z, Y = history['Z1'], history['Y']
         labels = labels[0] if isinstance(labels[0], list) else labels[0].tolist()
     elif viewer_id == 'viewer_2':
-        Z, Y, sigma = history['Z2'], history['Y'], history['sigma']
+        Z, Y = history['Z2'], history['Y']
         X = X.T
         labels = labels[1] if isinstance(labels[1], list) else labels[1].tolist()
         logger.debug(f"LABELS: {labels[:5]}")
@@ -271,21 +270,24 @@ def make_figure(history, umatrix_hisotry, X, rank, labels, viewer_name='U_matrix
         logger.debug("Set viewer_id")
 
     # Build figure
+    x1, x2 = Z[:, 0].min(), Z[:, 0].max()
+    y1, y2 = Z[:, 1].min(), Z[:, 1].max()
     fig = go.Figure(
         layout=go.Layout(
             xaxis=dict(
-                range=[Z[:, 0].min() - 0.1, Z[:, 0].max() + 0.1],
+                range=[Z[:, 0].min() + 0.05, Z[:, 0].max() + 0.05],
                 visible=False,
                 autorange=True,
             ),
             yaxis=dict(
-                range=[Z[:, 1].min() - 0.1, Z[:, 1].max() + 0.1],
+                range=[Z[:, 1].min() - 0.1, Z[:, 1].max() + 0.2],
                 visible=False,
                 scaleanchor='x',
                 scaleratio=1.0,
             ),
             showlegend=False,
             autosize=True,
+            plot_bgcolor="#FFFFFF",
             margin=dict(
                 b=0,
                 t=0,
@@ -294,15 +296,14 @@ def make_figure(history, umatrix_hisotry, X, rank, labels, viewer_name='U_matrix
             ),
         ),
     )
-
-    if viewer_name=="topic":
+    
+    if viewer_name == "topic":
         n_components = 5
         fig = draw_topics(fig, Y, n_components, viewer_id)
-    elif viewer_name=="CCP":
+    elif viewer_name == "CCP":
         fig = draw_ccp(fig, Y, history['Zeta'], history['resolution'], clicked_z, viewer_id)
     else:
         fig = draw_umatrix(fig, umatrix_hisotry, viewer_id)
-
     if viewer_id == 'viewer_2':
         _, unique_Z_idx = np.unique(Z, axis=0, return_index=True)
         logger.debug(unique_Z_idx)
@@ -310,16 +311,16 @@ def make_figure(history, umatrix_hisotry, X, rank, labels, viewer_name='U_matrix
         labels = np.array(labels)
         labels[duplicated_Z_idx] = ''
 
-
-
     fig = draw_scatter(fig, Z, labels, rank, viewer_id)
 
     fig.update_coloraxes(
         showscale=False
     )
     fig.update_layout(
-        plot_bgcolor=(PAPER_COLOR if viewer_id == 'viewer_1' else WORD_COLOR)
+        plot_bgcolor=(PAPER_COLOR if viewer_id == 'viewer_1' else WORD_COLOR),
     )
+    
+
     fig.update(
         layout_coloraxis_showscale=False,
         layout_showlegend=False,
