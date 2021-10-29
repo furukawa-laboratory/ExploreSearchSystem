@@ -102,12 +102,17 @@ make_search_component = lambda landing: dbc.Col([
 
 make_map = lambda id, viewer_id: dbc.Col(
     id=f'{id}-col',
-    children=dcc.Loading(
+    children=dcc.Loading([
         dcc.Graph(
             id=id,
             figure=make_first_figure(viewer_id),
             config=dict(displayModeBar=False),
         ),
+        html.Div(
+            id=f'{id}-loading-toggler',
+            style=dict(display=None),
+        )
+        ],
         id=f'{id}-loading',
     ),
     style={"height": "100%", "display":"none"},
