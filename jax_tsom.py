@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 import numpy as np
-from scipy.spatial import distance as dist
 from tensorly.decomposition import parafac
+import jax
+import jax.numpy as jnp
+from functools import partial
 
 
 cdist = lambda XA, XB: np.sum((XA[:, None] - XB[None, :])**2, axis=2)
@@ -80,42 +82,49 @@ class ManifoldModeling:
         self.history['sigma2'] = np.zeros(nb_epoch)
         self.history['sigma'] = np.zeros(nb_epoch)
 
+        X = jnp.array(self.X)
         Y = None
+        Z1 = jnp.array(self.Z1)
+        Z2 = jnp.array(self.Z2)
+        Zeta1 = jnp.array(self.Zeta1)
+        Zeta2 = jnp.array(self.Zeta2)
 
         for epoch in range(nb_epoch):
             # 学習量の決定
             sigma1 = max(self.SIGMA1_MIN, self.SIGMA1_MIN + (self.SIGMA1_MAX - self.SIGMA1_MIN) * (1 - (epoch / self.tau1)))
             sigma2 = max(self.SIGMA2_MIN, self.SIGMA2_MIN + (self.SIGMA2_MAX - self.SIGMA2_MIN) * (1 - (epoch / self.tau2)))
-            Y, self.Z1, self.Z2 = fit_once(self.X, Y, self.Z1, self.Z2, self.Zeta1, self.Zeta2, sigma1, sigma2)
+            Y, Z1, Z2 = fit_once(X, Y, Z1, Z2, Zeta1, Zeta2, sigma1, sigma2)
 
-            self.history['y'][epoch, :, :] = Y
-            self.history['z1'][epoch, :] = self.Z1
-            self.history['z2'][epoch, :] = self.Z2
+            self.history['y'][epoch, :, :] = np.array(Y)
+            self.history['z1'][epoch, :] = np.array(Z1)
+            self.history['z2'][epoch, :] = np.array(Z2)
             self.history['sigma1'][epoch] = sigma1
             self.history['sigma2'][epoch] = sigma2
             self.history['sigma'][epoch] = sigma2
 
 
+# @partial(jax.jit, static_argnums=(6, 7))
+@jax.jit
 def fit_once(X, Y, Z1, Z2, Zeta1, Zeta2, sigma1, sigma2):
     distance1 = cdist(Zeta1, Z1)  # 距離行列をつくるDはN*K行列
-    H1 = np.exp(-distance1 / (2 * sigma1**2))  # かっこに気を付ける
-    G1 = np.sum(H1, axis=1)  # Gは行ごとの和をとったベクトル
+    H1 = jnp.exp(-distance1 / (2 * sigma1**2))  # かっこに気を付ける
+    G1 = jnp.sum(H1, axis=1)  # Gは行ごとの和をとったベクトル
     R1 = (H1.T / G1).T  # 行列の計算なので.Tで転置を行う
 
     distance2 = cdist(Zeta2, Z2)  # 距離行列をつくるDはN*K行列
-    H2 = np.exp(-distance2 / (2 * sigma2**2))  # かっこに気を付ける
-    G2 = np.sum(H2, axis=1)  # Gは行ごとの和をとったベクトル
+    H2 = jnp.exp(-distance2 / (2 * sigma2**2))  # かっこに気を付ける
+    G2 = jnp.sum(H2, axis=1)  # Gは行ごとの和をとったベクトル
     R2 = (H2.T / G2).T  # 行列の計算なので.Tで転置を行う
 
     #２次モデルの決定
-    Y = np.einsum('ki,lj,ijd->kld', R1, R2, X)
+    Y = jnp.einsum('ki,lj,ijd->kld', R1, R2, X)
     # １次モデル，２次モデルの決定
-    U = np.einsum('lj,ijd->ild', R2, X)
-    V = np.einsum('ki,ijd->kjd', R1, X)
+    U = jnp.einsum('lj,ijd->ild', R2, X)
+    V = jnp.einsum('ki,ijd->kjd', R1, X)
 
     # 勝者決定
-    k_star1 = np.argmin(np.sum(np.square(U[:, None, :, :] - Y[None, :, :, :]), axis=(2, 3)), axis=1)
-    k_star2 = np.argmin(np.sum(np.square(V[:, :, None, :] - Y[:, None, :, :]), axis=(0, 3)), axis=1)
+    k_star1 = jnp.argmin(jnp.sum(jnp.square(U[:, None, :, :] - Y[None, :, :, :]), axis=(2, 3)), axis=1)
+    k_star2 = jnp.argmin(jnp.sum(jnp.square(V[:, :, None, :] - Y[:, None, :, :]), axis=(0, 3)), axis=1)
 
     Z1 = Zeta1[k_star1, :]  # k_starのZの座標N*L(L=2
     Z2 = Zeta2[k_star2, :]  # k_starのZの座標N*L(L=2
@@ -136,7 +145,7 @@ if __name__ == '__main__':
     resolution=10
     model_name="TSOM"
 
-    X = np.array(np.arange(10*100).reshape(10, 100), dtype=np.float64)
+    X = np.array(np.arange(100*600).reshape(100, 600), dtype=np.float64)
 
     start = time()
     mm = ManifoldModeling(

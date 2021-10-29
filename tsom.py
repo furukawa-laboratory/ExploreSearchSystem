@@ -219,8 +219,8 @@ if __name__ == '__main__':
     seed = 1
     resolution=10
     model_name="TSOM"
-    
-    X = np.array(np.arange(20).reshape(5,4), dtype=np.float64)    
+
+    X = np.array(np.arange(100*600).reshape(100, 600), dtype=np.float64)
     mm = ManifoldModeling(
             X,
             latent_dim=latent_dim,
