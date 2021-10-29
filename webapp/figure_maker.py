@@ -11,8 +11,10 @@ from scipy.spatial import distance as dist
 from Grad_norm import Grad_Norm
 from webapp import logger
 
+
 resolution = 10
 u_resolution = 10
+word_num = 200
 CCP_VIEWER = 'CCP'
 UMATRIX_VIEWER = 'U-matrix'
 TOPIC_VIEWER = 'topic'
@@ -61,6 +63,7 @@ def prepare_umatrix(keyword, X, Z1, Z2, sigma, labels, u_resolution, within_5yea
             pickle.dump(umatrix_history, f)
 
     return umatrix_history
+
 
 def prepare_materials(keyword, model_name, within_5years):
     logger.info(f"Preparing {keyword} map with {model_name}")
@@ -238,16 +241,23 @@ def get_bmu(Zeta, clickData):
 def draw_scatter(fig, Z, labels, rank, viewer_name):
     rank = np.linspace(1, len(labels), len(labels))
     logger.debug(f"viewer_name: {viewer_name}")
+    logger.debug(f"Z: {Z.shape}, labels:{len(labels)}, rank:{len(rank)}")
+    if viewer_name == 'viewer_2':
+        Z = Z[:word_num]
+        labels = labels[:word_num]
+        rank = rank[:word_num]
+
     fig.add_trace(
         go.Scatter(
             x=Z[:, 0],
             y=Z[:, 1],
             mode=f"markers+text",
+            name="",
             marker=dict(
-                size=rank[::-1],
+                size=(rank[::-1])*(1 if viewer_name == 'viewer_1' else 0.5),
                 sizemode='area',
                 sizeref=2. * max(rank) / (40. ** 2),
-                sizemin=4,
+                sizemin=10,
             ),
             text=(labels if viewer_name == 'viewer_2' else rank),
             hovertext=labels,
@@ -255,6 +265,7 @@ def draw_scatter(fig, Z, labels, rank, viewer_name):
                 bgcolor="rgba(255, 255, 255, 0.75)",
             ),
             textposition='top center',
+            hovertemplate="<b>%{hovertext}</b>",
         )
     )
     return fig
@@ -300,7 +311,7 @@ def make_figure(history, umatrix_hisotry, X, rank, labels, viewer_name='U_matrix
             ),
         ),
     )
-    
+
     if viewer_name == "topic":
         n_components = 5
         fig = draw_topics(fig, Y, n_components, viewer_id)
@@ -323,7 +334,7 @@ def make_figure(history, umatrix_hisotry, X, rank, labels, viewer_name='U_matrix
     fig.update_layout(
         plot_bgcolor=(PAPER_COLOR if viewer_id == 'viewer_1' else WORD_COLOR),
     )
-    
+
 
     fig.update(
         layout_coloraxis_showscale=False,
@@ -354,39 +365,13 @@ def draw_toi(fig, clickData, view_method, viewer_id):
         TOPIC_VIEWER: 'yellow',
     }[view_method]
     color = PAPER_COLORS if viewer_id == 'viewer_1' else WORD_COLORS
-    radius = 0.11
     x, y = clickData['points'][0]['x'], clickData['points'][0]['y']
-    # fig.add_shape(
-    #     type='circle',
-    #     line=dict(
-    #         color=color[-1],
-    #         width=3.0,
-    #         dash='longdashdot',
-    #     ),
-    #     x0=(x - radius),
-    #     y0=(y - radius),
-    #     x1=(x + radius),
-    #     y1=(y + radius),
-    # )
-    # radius = 0.15
-    # fig.add_shape(
-    #     type='circle',
-    #     line=dict(
-    #         color=color[-1],
-    #         width=3.0,
-    #         dash='longdashdot',
-    #     ),
-    #     x0=(x - radius),
-    #     y0=(y - radius),
-    #     x1=(x + radius),
-    #     y1=(y + radius),
-    # )
+    radius = 0.15
     fig.add_shape(
         type='circle',
         line=dict(
             color=color[0],
             width=9.0,
-            # dash='longdashdot',
         ),
         x0=(x - radius),
         y0=(y - radius),
@@ -398,7 +383,6 @@ def draw_toi(fig, clickData, view_method, viewer_id):
         line=dict(
             color=color[-1],
             width=5,
-            # dash='longdashdot',
         ),
         x0=(x - radius),
         y0=(y - radius),
