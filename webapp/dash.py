@@ -4,7 +4,7 @@ import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html
 from webapp import app
-from webapp.figure_maker import make_first_figure
+from webapp.figure_maker import PAPER_COLOR, WORD_COLOR, make_first_figure
 
 
 # U-Matrix の説明用のモーダル
@@ -102,19 +102,29 @@ make_search_component = lambda landing: dbc.Col([
 
 make_map = lambda id, viewer_id: dbc.Col(
     id=f'{id}-col',
-    children=dcc.Loading([
-        dcc.Graph(
-            id=id,
-            figure=make_first_figure(viewer_id),
-            config=dict(displayModeBar=False),
+    children=[
+        html.H4(
+            ("論文マップ" if viewer_id == 'viewer_1' else "単語マップ"),
+            style=dict(
+                textAlign='center',
+                marginBottom='0',
+                fontSize='2rem',
+                textDecoration='underline',
+                textDecorationColor=(PAPER_COLOR if viewer_id == 'viewer_1' else WORD_COLOR),
+            ),
         ),
-        html.Div(
-            id=f'{id}-loading-toggler',
-            style=dict(display=None),
-        )
-        ],
-        id=f'{id}-loading',
-    ),
+        dcc.Loading([
+            dcc.Graph(
+                id=id,
+                figure=make_first_figure(viewer_id),
+                config=dict(displayModeBar=False),
+            ),
+            html.Div(
+                id=f'{id}-loading-toggler',
+                style=dict(display=None),
+            )
+        ], id=f'{id}-loading'),
+    ],
     style={"height": "100%", "display":"none"},
     md=12,
     xl=6,
