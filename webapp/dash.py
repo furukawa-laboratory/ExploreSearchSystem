@@ -40,8 +40,8 @@ link_card = dbc.Card([
 view_options = dbc.Col([
         dbc.RadioItems(
             options=[
-                {'label': 'U-matrix 表示', 'value': 'U-matrix'},
-                {'label': 'CCP 表示', 'value': 'CCP'},
+                {'label': '類似度強調表示', 'value': 'U-matrix'},
+                {'label': 'ターゲット解析', 'value': 'CCP'},
                 {'label': 'クラスタ表示', 'value': 'topic'},
             ],
             value='U-matrix',
